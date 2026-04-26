@@ -1,0 +1,46 @@
+version: "0.1.0"
+description: 健康指導テンプレ Memory スキーマ
+location: memory/{subject_id}/
+files:
+  - id: decisions
+    filename: decisions.jsonl
+    format: jsonl
+    schema_line: '{"_schema": "memory.decision", "_version": "1.0"}'
+    fields:
+      - { key: id, type: string, required: true }
+      - { key: recorded_at, type: datetime, required: true }
+      - { key: title, type: string }
+      - { key: context, type: text }
+      - { key: alternatives_considered, type: array }
+      - { key: decision, type: text }
+      - { key: rationale, type: text }
+      - { key: outcome, type: text, optional: true }
+    append_only: true
+  - id: failures
+    filename: failures.jsonl
+    format: jsonl
+    schema_line: '{"_schema": "memory.failure", "_version": "1.0"}'
+    fields:
+      - { key: id, type: string, required: true }
+      - { key: recorded_at, type: datetime, required: true }
+      - { key: what_went_wrong, type: text, required: true }
+      - { key: root_cause, type: text }
+      - { key: prevention, type: text }
+      - { key: pattern_tags, type: array }
+    append_only: true
+  - id: experiences
+    filename: experiences.jsonl
+    format: jsonl
+    schema_line: '{"_schema": "memory.experience", "_version": "1.0"}'
+    fields:
+      - { key: id, type: string, required: true }
+      - { key: recorded_at, type: datetime, required: true }
+      - { key: insight, type: text, required: true }
+      - { key: emotional_weight, type: integer, range: [1, 10], required: true }
+      - { key: tags, type: array }
+    append_only: true
+  - id: personalization
+    filename: personalization.md
+    format: markdown
+    description: subject 固有の反応パターン・効いた介入・コミュ特性。手書きで継続更新
+    append_only: false

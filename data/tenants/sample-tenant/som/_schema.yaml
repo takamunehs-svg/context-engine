@@ -1,0 +1,42 @@
+version: "0.1.0"
+description: 健康指導テンプレ SoM スキーマ
+decision_types:
+  - id: intervention_plan
+    label: 介入計画
+    inputs_required:
+      - dictionary: classifications/risk-levels
+      - dictionary: thresholds/intervention-thresholds
+      - dictionary: references/program-design
+      - soa: latest measurement of subject
+      - soa: latest 3 sessions of subject
+      - memory: subject (when ON)
+    output_fields:
+      - { key: risk_level, type: string }
+      - { key: intervention_mix, type: array }
+      - { key: cycle_weeks, type: integer }
+      - { key: precautions, type: array }
+      - { key: rationale, type: text }
+      - { key: memory_referenced, type: boolean }
+  - id: weekly_review
+    label: 週次レビュー
+    inputs_required:
+      - soa: 1週間分の events
+      - som: 直近 intervention_plan
+      - memory: subject (when ON)
+    output_fields:
+      - { key: judgment, type: string, enum: [GO, ADJUST, STOP] }
+      - { key: rationale, type: text }
+      - { key: next_actions, type: array }
+  - id: medical_referral
+    label: 医療連携判定
+    inputs_required:
+      - dictionary: thresholds/intervention-thresholds
+      - soa: 当該イベント
+    output_fields:
+      - { key: required, type: boolean }
+      - { key: reason, type: text }
+      - { key: triggered_thresholds, type: array }
+versioning:
+  enabled: true
+  superseded_by: true
+append_only: false

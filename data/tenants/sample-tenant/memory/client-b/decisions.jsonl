@@ -1,0 +1,2 @@
+{"_schema": "memory.decision", "_version": "1.0", "_description": "Client B decisions log. Append-only."}
+{"id": "dec-2026-04-001", "recorded_at": "2026-04-10T14:30:00+09:00", "title": "初期プログラム方向性", "context": "運動初心者・体重減量希望・出張多い", "alternatives_considered": ["有酸素中心", "筋トレ中心", "ハイブリッド"], "decision": "ハイブリッド（基本動作習得 + 軽有酸素）", "rationale": "出張中もできる種目を残しつつ、フォーム習得を優先"}

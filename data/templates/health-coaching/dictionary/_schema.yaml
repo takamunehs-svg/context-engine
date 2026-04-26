@@ -1,0 +1,19 @@
+version: "0.1.0"
+description: 健康指導テンプレ辞書層スキーマ
+sections:
+  classifications:
+    description: 分類体系
+    files:
+      - risk-levels.yaml      # リスク階層
+  thresholds:
+    description: 判定閾値
+    files:
+      - intervention-thresholds.yaml
+  references:
+    description: 参照モデル（Markdown）
+    files:
+      - program-design.md
+edit_policy:
+  who: tenant_admin
+  frequency: yearly
+  read_only_for_ai: true

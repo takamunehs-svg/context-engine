@@ -1,0 +1,5 @@
+{"_schema": "memory.experience", "_version": "1.0", "_description": "Client A experiences log. Append-only."}
+{"id": "exp-2025-08-001", "recorded_at": "2025-08-19T10:30:00+09:00", "insight": "「体重が減るより、洋服が楽になることのほうが嬉しい」と発言。指標の翻訳が大事", "emotional_weight": 8, "tags": ["指標", "動機付け", "言語化"]}
+{"id": "exp-2025-11-001", "recorded_at": "2025-11-04T10:30:00+09:00", "insight": "孫を抱っこできるようになったことが最大のモチベーション。これを起点にプログラム説明すると納得度が違う", "emotional_weight": 9, "tags": ["動機付け", "家族", "ストーリー"]}
+{"id": "exp-2026-02-001", "recorded_at": "2026-02-18T10:30:00+09:00", "insight": "数値目標より「次に試したい動作」のほうが継続意欲が高まる", "emotional_weight": 7, "tags": ["動機付け", "目標設定"]}
+{"id": "exp-2026-04-001", "recorded_at": "2026-04-15T10:30:00+09:00", "insight": "睡眠の質改善を本人がはっきり実感している。これは優先指標として残す", "emotional_weight": 7, "tags": ["睡眠", "実感", "指標"]}

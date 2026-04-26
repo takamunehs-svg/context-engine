@@ -1,0 +1,4 @@
+{"_schema": "memory.decision", "_version": "1.0", "_description": "Client C decisions log. Append-only."}
+{"id": "dec-2025-10-001", "recorded_at": "2025-10-15T11:30:00+09:00", "title": "膝介入の優先順位", "context": "整形外科処方ありの変形性膝関節症（中期）", "alternatives_considered": ["大腿四頭筋単独強化", "股関節含めた連動強化", "可動域回復優先"], "decision": "股関節含めた連動強化（中間関節原則）", "rationale": "膝単独ではなく、股関節・足関節も評価。隣接関節の不全が膝に負担をかけているケースが多い"}
+{"id": "dec-2025-12-001", "recorded_at": "2025-12-03T11:30:00+09:00", "title": "痛み自己評価の補正方法", "context": "本人の NRS 申告が控えめ", "alternatives_considered": ["NRSをそのまま採用", "顔・動作観察で補正", "セッション中の動作中NRSも記録"], "decision": "動作中NRSも記録し、休息時NRSと差を見る", "rationale": "本人の口頭申告は遠慮が入る。動作中・前後の差を取ることで実態に近づく"}
+{"id": "dec-2026-02-001", "recorded_at": "2026-02-19T11:30:00+09:00", "title": "宿題内容の選定", "context": "退職後で時間あるが、過剰負荷リスク", "alternatives_considered": ["毎日10分", "週3回20分", "本人ペースで自由"], "decision": "週3回20分（散歩 + 簡易筋トレ）", "rationale": "毎日にすると過剰やり込みリスク。週3で十分。本人にも『これ以上はしない』と明示"}

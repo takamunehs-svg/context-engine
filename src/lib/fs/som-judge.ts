@@ -1,0 +1,333 @@
+import { paths } from './paths';
+import { readYaml, listDir } from './reader';
+import { loadMemory } from './subject';
+import { getDictionarySchema } from './tenant';
+import path from 'node:path';
+import yaml from 'js-yaml';
+import { promises as fs } from 'node:fs';
+import type {
+  JudgeInput,
+  JudgeOutput,
+  SoMRulesFile,
+  SoMRule,
+  MemoryBundle,
+} from '@/types/core';
+
+/**
+ * Phase 0 の SoM 判定エンジン。
+ * 決定論的ロジック（LLMなし）。テーブル駆動方式（杉本本由来）+ Memory ON/OFF（Muratcan由来）。
+ *
+ * Memory ON のとき、出力に「subject 固有の補足」が加わることで
+ * 「使うほど subject 固有化していく」を体感できる。
+ */
+export async function judge(input: JudgeInput): Promise<JudgeOutput> {
+  const { tenant_id, subject_id, decision_type, current_facts, use_memory } = input;
+
+  // 1. ルール読み込み
+  const rules = await loadAllRules(tenant_id);
+
+  // 2. ルール評価（Phase 0：単純な any/all/default トリガー）
+  const matched = evaluateRules(rules, current_facts);
+
+  // 3. Memory 読み込み（ON でも OFF でも件数は表示する）
+  const memory = await loadMemory(tenant_id, subject_id);
+  const memoryExcerpts = use_memory ? extractRelevantMemory(memory, matched, current_facts) : {};
+
+  // 4. 出力レンダリング
+  const rendered = renderOutput(decision_type, current_facts, matched, use_memory, memory, memoryExcerpts);
+
+  return {
+    decision_type,
+    subject_id,
+    use_memory,
+    memory_referenced: {
+      used: use_memory,
+      counts: memory.counts,
+      excerpts: memoryExcerpts,
+    },
+    rule_match: {
+      matched_rule_id: matched?.rule_id ?? null,
+      output: matched?.output ?? {},
+    },
+    rendered,
+  };
+}
+
+async function loadAllRules(tenantId: string): Promise<SoMRule[]> {
+  const dir = paths.somRulesDir(tenantId);
+  const files = await listDir(dir);
+  const all: SoMRule[] = [];
+  for (const f of files) {
+    if (!f.endsWith('.yaml') && !f.endsWith('.yml')) continue;
+    const text = await fs.readFile(path.join(dir, f), 'utf-8');
+    const parsed = yaml.load(text) as SoMRulesFile;
+    all.push(...(parsed.rules ?? []));
+  }
+  return all;
+}
+
+function evaluateRules(
+  rules: SoMRule[],
+  facts: Record<string, unknown>
+): SoMRule | null {
+  // ルールは記述順で評価。最初にマッチしたものを採用。
+  // default は最後に評価。
+  const nonDefault = rules.filter((r) => r.trigger !== 'default');
+  const defaults = rules.filter((r) => r.trigger === 'default');
+
+  for (const rule of nonDefault) {
+    if (matchesRule(rule, facts)) return rule;
+  }
+  return defaults[0] ?? null;
+}
+
+function matchesRule(rule: SoMRule, facts: Record<string, unknown>): boolean {
+  if (!rule.conditions || rule.conditions.length === 0) return false;
+  const trigger = rule.trigger ?? 'all';
+  const results = rule.conditions.map((c) => evalCondition(c, facts));
+  if (trigger === 'any') return results.some(Boolean);
+  if (trigger === 'all') return results.every(Boolean);
+  return false;
+}
+
+function evalCondition(
+  cond: NonNullable<SoMRule['conditions']>[number],
+  facts: Record<string, unknown>
+): boolean {
+  const v = getByPath(facts, cond.field);
+  if (v === undefined || v === null) return false;
+  const numV = typeof v === 'number' ? v : Number(v);
+  if (Number.isNaN(numV)) return false;
+
+  const numTarget = typeof cond.value === 'number' ? cond.value : Number(cond.value);
+  if (Number.isNaN(numTarget)) return false;
+
+  let primary = false;
+  switch (cond.op) {
+    case '>=':
+      primary = numV >= numTarget;
+      break;
+    case '>':
+      primary = numV > numTarget;
+      break;
+    case '<=':
+      primary = numV <= numTarget;
+      break;
+    case '<':
+      primary = numV < numTarget;
+      break;
+    case '==':
+      primary = numV === numTarget;
+      break;
+    default:
+      return false;
+  }
+  if (!primary) return false;
+
+  if (cond.op2 && cond.value2 !== undefined) {
+    const numTarget2 = typeof cond.value2 === 'number' ? cond.value2 : Number(cond.value2);
+    if (Number.isNaN(numTarget2)) return primary;
+    let secondary = false;
+    switch (cond.op2) {
+      case '>=':
+        secondary = numV >= numTarget2;
+        break;
+      case '>':
+        secondary = numV > numTarget2;
+        break;
+      case '<=':
+        secondary = numV <= numTarget2;
+        break;
+      case '<':
+        secondary = numV < numTarget2;
+        break;
+    }
+    return primary && secondary;
+  }
+  return primary;
+}
+
+function getByPath(obj: unknown, dotPath: string): unknown {
+  return dotPath.split('.').reduce<unknown>((acc, key) => {
+    if (acc && typeof acc === 'object' && key in (acc as Record<string, unknown>)) {
+      return (acc as Record<string, unknown>)[key];
+    }
+    return undefined;
+  }, obj);
+}
+
+/**
+ * Memory から「今回の判定に関係しそうな」抜粋を取り出す。
+ * Phase 0 はシンプルに：
+ *  - personalization.md は全文（短い前提）
+ *  - failures は最新3件
+ *  - decisions は最新3件
+ *  - experiences は emotional_weight >= 7 のもの
+ */
+function extractRelevantMemory(
+  memory: MemoryBundle,
+  _matched: SoMRule | null,
+  _facts: Record<string, unknown>
+) {
+  return {
+    personalization: memory.personalization || undefined,
+    failure_patterns: memory.failures
+      .slice(-3)
+      .map((f) => `${f.what_went_wrong} → 予防策: ${f.prevention}`),
+    relevant_decisions: memory.decisions
+      .slice(-3)
+      .map((d) => `${d.title}: ${d.decision}（理由: ${d.rationale}）`),
+    strong_experiences: memory.experiences
+      .filter((e) => e.emotional_weight >= 7)
+      .map((e) => `[${e.emotional_weight}/10] ${e.insight}`),
+  };
+}
+
+function renderOutput(
+  decisionType: string,
+  facts: Record<string, unknown>,
+  matched: SoMRule | null,
+  useMemory: boolean,
+  memory: MemoryBundle,
+  excerpts: ReturnType<typeof extractRelevantMemory>
+): string {
+  const lines: string[] = [];
+  lines.push(`# ${decisionTypeLabel(decisionType)} — 判定結果\n`);
+
+  lines.push(`## 1. 入力された事実 (facts)\n`);
+  lines.push('```json');
+  lines.push(JSON.stringify(facts, null, 2));
+  lines.push('```\n');
+
+  lines.push(`## 2. ルール照合\n`);
+  if (matched) {
+    lines.push(`- **マッチしたルール**: \`${matched.rule_id}\``);
+    lines.push(`- **risk_level**: ${matched.output.risk_level ?? '—'}`);
+    lines.push(`- **action**: ${matched.output.action ?? '—'}`);
+    lines.push(`- **rationale**: ${matched.output.rationale ?? '—'}`);
+  } else {
+    lines.push('- マッチするルールなし（ルール定義の見直しが必要）');
+  }
+  lines.push('');
+
+  lines.push(`## 3. Memory 参照（${useMemory ? 'ON' : 'OFF'}）\n`);
+  lines.push(`- decisions: ${memory.counts.decisions}件 / failures: ${memory.counts.failures}件 / experiences: ${memory.counts.experiences}件 / personalization: ${memory.counts.has_personalization ? 'あり' : 'なし'}`);
+  lines.push('');
+
+  if (!useMemory) {
+    lines.push('> Memory を参照していないため、出力は **辞書層 + ルール + 当該事実** のみから生成された汎用的な内容です。');
+    lines.push('> この subject の過去の判断・失敗・効いた介入・反応パターンは反映されていません。');
+    lines.push('');
+    lines.push(`## 4. 推奨アクション（汎用）\n`);
+    lines.push(genericRecommendation(matched));
+    return lines.join('\n');
+  }
+
+  // Memory ON
+  lines.push('> Memory を参照しているため、この subject 固有の過去資産が出力に反映されます。');
+  lines.push('');
+
+  if (excerpts.personalization && excerpts.personalization.trim().length > 0) {
+    lines.push('### 3.1 personalization.md（subject 固有の反応パターン）\n');
+    lines.push('```markdown');
+    lines.push(excerpts.personalization.trim());
+    lines.push('```\n');
+  }
+
+  if ((excerpts.failure_patterns?.length ?? 0) > 0) {
+    lines.push('### 3.2 過去の失敗パターン（最新 3 件）\n');
+    for (const f of excerpts.failure_patterns!) {
+      lines.push(`- ${f}`);
+    }
+    lines.push('');
+  }
+
+  if ((excerpts.relevant_decisions?.length ?? 0) > 0) {
+    lines.push('### 3.3 関連する過去判断（最新 3 件）\n');
+    for (const d of excerpts.relevant_decisions!) {
+      lines.push(`- ${d}`);
+    }
+    lines.push('');
+  }
+
+  if ((excerpts.strong_experiences?.length ?? 0) > 0) {
+    lines.push('### 3.4 強いエピソード（emotional_weight ≥ 7）\n');
+    for (const e of excerpts.strong_experiences!) {
+      lines.push(`- ${e}`);
+    }
+    lines.push('');
+  }
+
+  lines.push(`## 4. 推奨アクション（subject 固有化版）\n`);
+  lines.push(personalizedRecommendation(matched, excerpts));
+  return lines.join('\n');
+}
+
+function genericRecommendation(matched: SoMRule | null): string {
+  if (!matched) return '- ルール未マッチ。辞書層と判定ルールの確認が必要';
+  const action = String(matched.output.action ?? '');
+  const map: Record<string, string[]> = {
+    medical_referral: [
+      '- 医療機関への紹介・連携を最優先',
+      '- 紹介状を準備し、来談者に説明',
+      '- 運動指導は医療側の評価後に再開判断',
+    ],
+    conditional_program_with_medical_consult: [
+      '- 主治医との情報共有のもと、低〜中強度から開始',
+      '- バイタル・症状を毎セッション記録',
+      '- 増悪時は即時中止 → 再評価',
+    ],
+    monitored_program: [
+      '- 通常プログラム＋モニタリング強化',
+      '- 週次で簡易レビュー',
+    ],
+    standard_program: [
+      '- 標準プログラムで開始',
+      '- 月次で進捗レビュー',
+    ],
+  };
+  const lines = map[action] ?? ['- ルール出力に従って次アクションを設計'];
+  return lines.join('\n');
+}
+
+function personalizedRecommendation(
+  matched: SoMRule | null,
+  excerpts: ReturnType<typeof extractRelevantMemory>
+): string {
+  const generic = genericRecommendation(matched);
+  const personalNotes: string[] = [];
+
+  if (excerpts.failure_patterns && excerpts.failure_patterns.length > 0) {
+    personalNotes.push('### 注意（過去の失敗から）');
+    for (const f of excerpts.failure_patterns) {
+      personalNotes.push(`- ${f}`);
+    }
+  }
+
+  if (excerpts.strong_experiences && excerpts.strong_experiences.length > 0) {
+    personalNotes.push('');
+    personalNotes.push('### この subject の効きどころ（強いエピソードから）');
+    for (const e of excerpts.strong_experiences) {
+      personalNotes.push(`- ${e}`);
+    }
+  }
+
+  if (personalNotes.length === 0) {
+    return generic + '\n\n> Memory が空または該当エントリなし。汎用と同等の出力です。';
+  }
+
+  return generic + '\n\n' + personalNotes.join('\n');
+}
+
+function decisionTypeLabel(t: string): string {
+  switch (t) {
+    case 'intervention_plan':
+      return '介入計画';
+    case 'weekly_review':
+      return '週次レビュー';
+    case 'medical_referral':
+      return '医療連携判定';
+    default:
+      return t;
+  }
+}

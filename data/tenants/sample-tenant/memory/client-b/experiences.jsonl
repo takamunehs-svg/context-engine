@@ -1,0 +1,2 @@
+{"_schema": "memory.experience", "_version": "1.0", "_description": "Client B experiences log. Append-only."}
+{"id": "exp-2026-04-001", "recorded_at": "2026-04-17T14:30:00+09:00", "insight": "初回後「意外と疲れた」発言。本人の予想より身体が衰えている自覚あり", "emotional_weight": 6, "tags": ["初回", "気付き"]}
