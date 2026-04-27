@@ -1,9 +1,19 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { appendSoAEvent, appendMemoryDecision, appendMemoryFailure, appendMemoryExperience } from '@/lib/fs/subject';
+import {
+  appendActivityEvent,
+  appendMemoryDecision,
+  appendMemoryFailure,
+  appendMemoryExperience,
+} from '@/lib/fs/subject';
 import { currentMonth } from '@/lib/fs/paths';
-import type { SoAEvent, MemoryDecision, MemoryFailure, MemoryExperience } from '@/types/core';
+import type {
+  ActivityEvent,
+  MemoryDecision,
+  MemoryFailure,
+  MemoryExperience,
+} from '@/types/core';
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -14,7 +24,7 @@ function genId(prefix: string): string {
 }
 
 // ─────────────────────────────────────────
-// SoA: イベント追加（append-only）
+// Activity Layer: イベント追加（append-only）
 // ─────────────────────────────────────────
 
 export async function addSessionEventAction(
@@ -22,7 +32,7 @@ export async function addSessionEventAction(
   subjectId: string,
   formData: FormData
 ) {
-  const event: SoAEvent = {
+  const event: ActivityEvent = {
     id: genId('evt'),
     event_type: 'session',
     subject_id: subjectId,
@@ -42,7 +52,7 @@ export async function addSessionEventAction(
       refs: [],
     },
   };
-  await appendSoAEvent(tenantId, currentMonth(), event);
+  await appendActivityEvent(tenantId, currentMonth(), event);
   revalidatePath(`/t/${tenantId}/subjects/${subjectId}`);
 }
 
@@ -51,7 +61,7 @@ export async function addMeasurementEventAction(
   subjectId: string,
   formData: FormData
 ) {
-  const event: SoAEvent = {
+  const event: ActivityEvent = {
     id: genId('evt'),
     event_type: 'measurement',
     subject_id: subjectId,
@@ -68,7 +78,7 @@ export async function addMeasurementEventAction(
       },
     },
   };
-  await appendSoAEvent(tenantId, currentMonth(), event);
+  await appendActivityEvent(tenantId, currentMonth(), event);
   revalidatePath(`/t/${tenantId}/subjects/${subjectId}`);
 }
 

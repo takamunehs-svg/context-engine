@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "context-engine",
   description:
-    "3層構造（辞書 / SoA / SoM）+ Episodic Memory のメタプラットフォーム — File System First",
+    "4層モデル（辞書 / 活動 / 管理 + Episodic Memory）のメタプラットフォーム — File System First",
 };
 
 export default function RootLayout({

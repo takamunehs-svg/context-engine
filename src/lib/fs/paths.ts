@@ -25,22 +25,40 @@ export const paths = {
   dictionarySchema: (tenantId: string) =>
     path.join(DATA_ROOT, 'tenants', tenantId, 'dictionary', '_schema.yaml'),
 
-  soaSchema: (tenantId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'soa', '_schema.yaml'),
-  soaEventsDir: (tenantId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'soa', 'events'),
-  soaMonthFile: (tenantId: string, yyyymm: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'soa', 'events', yyyymm, 'events.jsonl'),
-  soaSubjectsDir: (tenantId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'soa', 'subjects'),
-  soaSubject: (tenantId: string, subjectId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'soa', 'subjects', `${subjectId}.md`),
+  // Activity Layer（旧 SoA）
+  activitySchema: (tenantId: string) =>
+    path.join(DATA_ROOT, 'tenants', tenantId, 'activity', '_schema.yaml'),
+  activityEventsDir: (tenantId: string) =>
+    path.join(DATA_ROOT, 'tenants', tenantId, 'activity', 'events'),
+  activityMonthFile: (tenantId: string, yyyymm: string) =>
+    path.join(
+      DATA_ROOT,
+      'tenants',
+      tenantId,
+      'activity',
+      'events',
+      yyyymm,
+      'events.jsonl'
+    ),
+  activitySubjectsDir: (tenantId: string) =>
+    path.join(DATA_ROOT, 'tenants', tenantId, 'activity', 'subjects'),
+  activitySubject: (tenantId: string, subjectId: string) =>
+    path.join(
+      DATA_ROOT,
+      'tenants',
+      tenantId,
+      'activity',
+      'subjects',
+      `${subjectId}.md`
+    ),
 
-  somSchema: (tenantId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'som', '_schema.yaml'),
-  somRulesDir: (tenantId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'som', 'rules'),
+  // Management Layer（旧 SoM）
+  managementSchema: (tenantId: string) =>
+    path.join(DATA_ROOT, 'tenants', tenantId, 'management', '_schema.yaml'),
+  managementRulesDir: (tenantId: string) =>
+    path.join(DATA_ROOT, 'tenants', tenantId, 'management', 'rules'),
 
+  // Episodic Memory（subject別）
   memoryDir: (tenantId: string, subjectId: string) =>
     path.join(DATA_ROOT, 'tenants', tenantId, 'memory', subjectId),
   memoryDecisions: (tenantId: string, subjectId: string) =>
@@ -50,7 +68,14 @@ export const paths = {
   memoryExperiences: (tenantId: string, subjectId: string) =>
     path.join(DATA_ROOT, 'tenants', tenantId, 'memory', subjectId, 'experiences.jsonl'),
   memoryPersonalization: (tenantId: string, subjectId: string) =>
-    path.join(DATA_ROOT, 'tenants', tenantId, 'memory', subjectId, 'personalization.md'),
+    path.join(
+      DATA_ROOT,
+      'tenants',
+      tenantId,
+      'memory',
+      subjectId,
+      'personalization.md'
+    ),
 };
 
 export function currentMonth(): string {

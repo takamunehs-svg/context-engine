@@ -1,5 +1,11 @@
 // context-engine 共通型
 // 階層：context-engine → Tenant（N社）→ Subject（A社/B社/C社）
+//
+// 4層モデル：
+//   - Dictionary Layer（辞書層・テナント共通・年単位編集）
+//   - Activity Layer（活動層・現場ログ・append-only）— 杉本本 SoA に対応
+//   - Management Layer（管理層・判定・版管理）— 杉本本 SoM に対応
+//   - Episodic Memory（subject別・append-only・最も対象固有化する層）
 
 export type SubjectId = string;
 export type TenantId = string;
@@ -40,7 +46,7 @@ export interface SubjectProfile {
 }
 
 // ─────────────────────────────────────────
-// 辞書層（Dictionary）
+// Dictionary Layer（辞書層）
 // ─────────────────────────────────────────
 
 export interface DictionarySchema {
@@ -61,33 +67,33 @@ export interface DictionaryEntry {
 }
 
 // ─────────────────────────────────────────
-// SoA（System of Activity・append-only）
+// Activity Layer（活動層・append-only）
 // ─────────────────────────────────────────
 
 export type EventType = 'session' | 'measurement' | 'intake' | 'correction' | 'archive';
 
-export interface SoAEventContext {
+export interface ActivityEventContext {
   facts?: Record<string, unknown>;
   inputs?: Record<string, unknown>;
   refs?: string[];
   snapshot?: unknown;
 }
 
-export interface SoAEvent {
+export interface ActivityEvent {
   id: string;
   event_type: EventType;
   subject_id: SubjectId;
   recorded_at: string;
-  context: SoAEventContext;
+  context: ActivityEventContext;
 }
 
 // ─────────────────────────────────────────
-// SoM（System of Management・版管理）
+// Management Layer（管理層・版管理）
 // ─────────────────────────────────────────
 
 export type DecisionType = 'intervention_plan' | 'weekly_review' | 'medical_referral';
 
-export interface SoMRule {
+export interface ManagementRule {
   rule_id: string;
   trigger?: 'any' | 'all' | 'default';
   conditions?: Array<{
@@ -100,10 +106,10 @@ export interface SoMRule {
   output: Record<string, unknown>;
 }
 
-export interface SoMRulesFile {
+export interface ManagementRulesFile {
   version: string;
   description: string;
-  rules: SoMRule[];
+  rules: ManagementRule[];
 }
 
 // ─────────────────────────────────────────
@@ -155,7 +161,7 @@ export interface MemoryBundle {
 }
 
 // ─────────────────────────────────────────
-// SoM 判定エンジン
+// Management 判定エンジン
 // ─────────────────────────────────────────
 
 export interface JudgeInput {

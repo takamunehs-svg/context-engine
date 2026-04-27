@@ -1,5 +1,5 @@
 version: "0.1.0"
-description: 健康指導テンプレ SoM スキーマ
+description: 健康指導テンプレ Management Layer スキーマ
 decision_types:
   - id: intervention_plan
     label: 介入計画
@@ -7,8 +7,8 @@ decision_types:
       - dictionary: classifications/risk-levels
       - dictionary: thresholds/intervention-thresholds
       - dictionary: references/program-design
-      - soa: latest measurement of subject
-      - soa: latest 3 sessions of subject
+      - activity: latest measurement of subject
+      - activity: latest 3 sessions of subject
       - memory: subject (when ON)
     output_fields:
       - { key: risk_level, type: string }
@@ -20,8 +20,8 @@ decision_types:
   - id: weekly_review
     label: 週次レビュー
     inputs_required:
-      - soa: 1週間分の events
-      - som: 直近 intervention_plan
+      - activity: 1週間分の events
+      - management: 直近 intervention_plan
       - memory: subject (when ON)
     output_fields:
       - { key: judgment, type: string, enum: [GO, ADJUST, STOP] }
@@ -31,7 +31,7 @@ decision_types:
     label: 医療連携判定
     inputs_required:
       - dictionary: thresholds/intervention-thresholds
-      - soa: 当該イベント
+      - activity: 当該イベント
     output_fields:
       - { key: required, type: boolean }
       - { key: reason, type: text }

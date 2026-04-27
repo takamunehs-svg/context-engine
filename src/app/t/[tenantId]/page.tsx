@@ -94,7 +94,7 @@ export default async function TenantPage({ params }: PageProps) {
           ))}
         </div>
         <p className="mt-6 text-sm text-muted-foreground">
-          Memory の厚さに差をつけてあります。各 subject に入って「SoM 判定」で Memory ON/OFF を切り替えると、
+          Memory の厚さに差をつけてあります。各 subject に入って「Management 判定」で Memory ON/OFF を切り替えると、
           出力差が体感できます。
         </p>
       </section>

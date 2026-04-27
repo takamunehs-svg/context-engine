@@ -70,7 +70,7 @@ export function AddSessionEventForm({
         <Label htmlFor="client_subjective">クライアント主観コメント</Label>
         <Textarea id="client_subjective" name="client_subjective" rows={2} />
       </div>
-      <Button type="submit">SoAイベントを append</Button>
+      <Button type="submit">Activity イベントを append</Button>
     </form>
   );
 }

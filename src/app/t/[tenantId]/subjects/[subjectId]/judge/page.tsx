@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getTenantMeta } from "@/lib/fs/tenant";
 import { getSubjectProfile, loadMemory } from "@/lib/fs/subject";
-import { judge } from "@/lib/fs/som-judge";
+import { judge } from "@/lib/fs/management-judge";
 import {
   Card,
   CardContent,
@@ -73,10 +73,10 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
             >
               {profile.display_name}
             </Link>{" "}
-            / SoM judge
+            / Management judge
           </p>
           <h1 className="text-2xl font-bold tracking-tight">
-            SoM 判定 — Memory ON / OFF 比較
+            Management 判定 — Memory ON / OFF 比較
           </h1>
         </div>
         <Link href={`/t/${tenantId}/subjects/${subjectId}`}>

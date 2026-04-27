@@ -1,5 +1,5 @@
 version: "0.1.0"
-description: 健康指導テンプレ SoA スキーマ
+description: 健康指導テンプレ Activity Layer スキーマ
 event_types:
   - id: session
     label: セッション記録

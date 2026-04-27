@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTenantMeta } from "@/lib/fs/tenant";
-import { getSubjectProfile, listSoAEvents, loadMemory } from "@/lib/fs/subject";
+import { getSubjectProfile, listActivityEvents, loadMemory } from "@/lib/fs/subject";
 import {
   Card,
   CardContent,
@@ -26,7 +26,7 @@ export default async function SubjectPage({ params }: PageProps) {
   const [meta, profile, events, memory] = await Promise.all([
     getTenantMeta(tenantId),
     getSubjectProfile(tenantId, subjectId),
-    listSoAEvents(tenantId, subjectId),
+    listActivityEvents(tenantId, subjectId),
     loadMemory(tenantId, subjectId),
   ]);
 
@@ -45,7 +45,7 @@ export default async function SubjectPage({ params }: PageProps) {
           </h1>
         </div>
         <Link href={`/t/${tenantId}/subjects/${subjectId}/judge`}>
-          <Button>SoM 判定（Memory ON/OFF 比較）</Button>
+          <Button>Management 判定（Memory ON/OFF 比較）</Button>
         </Link>
       </div>
 
@@ -79,16 +79,16 @@ export default async function SubjectPage({ params }: PageProps) {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="soa" className="w-full">
+      <Tabs defaultValue="activity" className="w-full">
         <TabsList>
-          <TabsTrigger value="soa">SoA イベント ({events.length})</TabsTrigger>
+          <TabsTrigger value="activity">Activity イベント ({events.length})</TabsTrigger>
           <TabsTrigger value="memory">
             Memory ({memory.counts.total})
           </TabsTrigger>
           <TabsTrigger value="add">追加</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="soa" className="space-y-3 mt-4">
+        <TabsContent value="activity" className="space-y-3 mt-4">
           <p className="text-sm text-muted-foreground">
             <strong>append-only</strong>。既存行は変更されません。補正は新イベントで上書き。
           </p>
@@ -261,7 +261,7 @@ export default async function SubjectPage({ params }: PageProps) {
         <TabsContent value="add" className="space-y-6 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">SoA: セッション記録を追加</CardTitle>
+              <CardTitle className="text-base">Activity: セッション記録を追加</CardTitle>
               <CardDescription>append-only</CardDescription>
             </CardHeader>
             <CardContent>
@@ -270,7 +270,7 @@ export default async function SubjectPage({ params }: PageProps) {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">SoA: 測定を追加</CardTitle>
+              <CardTitle className="text-base">Activity: 測定を追加</CardTitle>
               <CardDescription>append-only</CardDescription>
             </CardHeader>
             <CardContent>

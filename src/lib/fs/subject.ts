@@ -5,7 +5,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import type {
   SubjectProfile,
-  SoAEvent,
+  ActivityEvent,
   MemoryBundle,
   MemoryDecision,
   MemoryFailure,
@@ -18,7 +18,7 @@ export async function getSubjectProfile(
   subjectId: SubjectId
 ): Promise<SubjectProfile> {
   const md = await readMarkdown<Omit<SubjectProfile, 'body' | 'raw'>>(
-    paths.soaSubject(tenantId, subjectId)
+    paths.activitySubject(tenantId, subjectId)
   );
   return {
     ...md.frontmatter,
@@ -30,20 +30,20 @@ export async function getSubjectProfile(
 }
 
 /**
- * subject の SoA イベントを全月分読む（Phase 0 用・小規模想定）
+ * subject の Activity イベントを全月分読む（Phase 0 用・小規模想定）
  * 後で月別ロード or 範囲指定に置き換える
  */
-export async function listSoAEvents(
+export async function listActivityEvents(
   tenantId: string,
   subjectId?: SubjectId
-): Promise<SoAEvent[]> {
-  const eventsRoot = paths.soaEventsDir(tenantId);
+): Promise<ActivityEvent[]> {
+  const eventsRoot = paths.activityEventsDir(tenantId);
   const months = await listDir(eventsRoot);
-  const all: SoAEvent[] = [];
+  const all: ActivityEvent[] = [];
   for (const month of months) {
     if (month.startsWith('.')) continue;
     const file = path.join(eventsRoot, month, 'events.jsonl');
-    const { entries } = await readJsonl<SoAEvent>(file);
+    const { entries } = await readJsonl<ActivityEvent>(file);
     all.push(...entries);
   }
   const filtered = subjectId ? all.filter((e) => e.subject_id === subjectId) : all;
@@ -52,18 +52,18 @@ export async function listSoAEvents(
   );
 }
 
-export async function appendSoAEvent(
+export async function appendActivityEvent(
   tenantId: string,
   yyyymm: string,
-  event: SoAEvent
+  event: ActivityEvent
 ): Promise<void> {
   await appendJsonl(
-    paths.soaMonthFile(tenantId, yyyymm),
+    paths.activityMonthFile(tenantId, yyyymm),
     event as unknown as Record<string, unknown>,
     {
-      _schema: 'soa.event',
+      _schema: 'activity.event',
       _version: '1.0',
-      _description: 'SoA event log. Append-only.',
+      _description: 'Activity event log. Append-only.',
     }
   );
 }

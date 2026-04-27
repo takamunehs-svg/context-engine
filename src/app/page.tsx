@@ -12,7 +12,8 @@ export default async function HomePage() {
           3層 × Episodic Memory で「使うほど subject 固有化」を体感する
         </h1>
         <p className="text-muted-foreground max-w-3xl leading-relaxed">
-          context-engine は、辞書層（普遍）/ SoA（現場ログ・append-only）/ SoM（判定・版管理） に、
+          context-engine は、辞書層（普遍）/ 活動層 (Activity Layer・現場ログ・append-only)
+          / 管理層 (Management Layer・判定・版管理) に、
           subject 別の Episodic Memory が積層していく構造を、
           ファイルシステム（MD / JSONL / YAML）の上で動かすメタプラットフォームです。
           <br />

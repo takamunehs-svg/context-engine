@@ -1,24 +1,26 @@
 import { paths } from './paths';
-import { readYaml, listDir } from './reader';
+import { listDir } from './reader';
 import { loadMemory } from './subject';
-import { getDictionarySchema } from './tenant';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import { promises as fs } from 'node:fs';
 import type {
   JudgeInput,
   JudgeOutput,
-  SoMRulesFile,
-  SoMRule,
+  ManagementRule,
+  ManagementRulesFile,
   MemoryBundle,
 } from '@/types/core';
 
 /**
- * Phase 0 の SoM 判定エンジン。
+ * Phase 0 の Management 判定エンジン。
  * 決定論的ロジック（LLMなし）。テーブル駆動方式（杉本本由来）+ Memory ON/OFF（Muratcan由来）。
  *
  * Memory ON のとき、出力に「subject 固有の補足」が加わることで
  * 「使うほど subject 固有化していく」を体感できる。
+ *
+ * 注：本エンジンは杉本本『データモデリングでドメインを駆動する』の SoM（System of Management）
+ * の概念を Management Layer に汎用語化したもの。
  */
 export async function judge(input: JudgeInput): Promise<JudgeOutput> {
   const { tenant_id, subject_id, decision_type, current_facts, use_memory } = input;
@@ -31,10 +33,19 @@ export async function judge(input: JudgeInput): Promise<JudgeOutput> {
 
   // 3. Memory 読み込み（ON でも OFF でも件数は表示する）
   const memory = await loadMemory(tenant_id, subject_id);
-  const memoryExcerpts = use_memory ? extractRelevantMemory(memory, matched, current_facts) : {};
+  const memoryExcerpts = use_memory
+    ? extractRelevantMemory(memory, matched, current_facts)
+    : {};
 
   // 4. 出力レンダリング
-  const rendered = renderOutput(decision_type, current_facts, matched, use_memory, memory, memoryExcerpts);
+  const rendered = renderOutput(
+    decision_type,
+    current_facts,
+    matched,
+    use_memory,
+    memory,
+    memoryExcerpts
+  );
 
   return {
     decision_type,
@@ -53,23 +64,23 @@ export async function judge(input: JudgeInput): Promise<JudgeOutput> {
   };
 }
 
-async function loadAllRules(tenantId: string): Promise<SoMRule[]> {
-  const dir = paths.somRulesDir(tenantId);
+async function loadAllRules(tenantId: string): Promise<ManagementRule[]> {
+  const dir = paths.managementRulesDir(tenantId);
   const files = await listDir(dir);
-  const all: SoMRule[] = [];
+  const all: ManagementRule[] = [];
   for (const f of files) {
     if (!f.endsWith('.yaml') && !f.endsWith('.yml')) continue;
     const text = await fs.readFile(path.join(dir, f), 'utf-8');
-    const parsed = yaml.load(text) as SoMRulesFile;
+    const parsed = yaml.load(text) as ManagementRulesFile;
     all.push(...(parsed.rules ?? []));
   }
   return all;
 }
 
 function evaluateRules(
-  rules: SoMRule[],
+  rules: ManagementRule[],
   facts: Record<string, unknown>
-): SoMRule | null {
+): ManagementRule | null {
   // ルールは記述順で評価。最初にマッチしたものを採用。
   // default は最後に評価。
   const nonDefault = rules.filter((r) => r.trigger !== 'default');
@@ -81,7 +92,7 @@ function evaluateRules(
   return defaults[0] ?? null;
 }
 
-function matchesRule(rule: SoMRule, facts: Record<string, unknown>): boolean {
+function matchesRule(rule: ManagementRule, facts: Record<string, unknown>): boolean {
   if (!rule.conditions || rule.conditions.length === 0) return false;
   const trigger = rule.trigger ?? 'all';
   const results = rule.conditions.map((c) => evalCondition(c, facts));
@@ -91,7 +102,7 @@ function matchesRule(rule: SoMRule, facts: Record<string, unknown>): boolean {
 }
 
 function evalCondition(
-  cond: NonNullable<SoMRule['conditions']>[number],
+  cond: NonNullable<ManagementRule['conditions']>[number],
   facts: Record<string, unknown>
 ): boolean {
   const v = getByPath(facts, cond.field);
@@ -166,7 +177,7 @@ function getByPath(obj: unknown, dotPath: string): unknown {
  */
 function extractRelevantMemory(
   memory: MemoryBundle,
-  _matched: SoMRule | null,
+  _matched: ManagementRule | null,
   _facts: Record<string, unknown>
 ) {
   return {
@@ -186,7 +197,7 @@ function extractRelevantMemory(
 function renderOutput(
   decisionType: string,
   facts: Record<string, unknown>,
-  matched: SoMRule | null,
+  matched: ManagementRule | null,
   useMemory: boolean,
   memory: MemoryBundle,
   excerpts: ReturnType<typeof extractRelevantMemory>
@@ -211,12 +222,18 @@ function renderOutput(
   lines.push('');
 
   lines.push(`## 3. Memory 参照（${useMemory ? 'ON' : 'OFF'}）\n`);
-  lines.push(`- decisions: ${memory.counts.decisions}件 / failures: ${memory.counts.failures}件 / experiences: ${memory.counts.experiences}件 / personalization: ${memory.counts.has_personalization ? 'あり' : 'なし'}`);
+  lines.push(
+    `- decisions: ${memory.counts.decisions}件 / failures: ${memory.counts.failures}件 / experiences: ${memory.counts.experiences}件 / personalization: ${memory.counts.has_personalization ? 'あり' : 'なし'}`
+  );
   lines.push('');
 
   if (!useMemory) {
-    lines.push('> Memory を参照していないため、出力は **辞書層 + ルール + 当該事実** のみから生成された汎用的な内容です。');
-    lines.push('> この subject の過去の判断・失敗・効いた介入・反応パターンは反映されていません。');
+    lines.push(
+      '> Memory を参照していないため、出力は **辞書層 + ルール + 当該事実** のみから生成された汎用的な内容です。'
+    );
+    lines.push(
+      '> この subject の過去の判断・失敗・効いた介入・反応パターンは反映されていません。'
+    );
     lines.push('');
     lines.push(`## 4. 推奨アクション（汎用）\n`);
     lines.push(genericRecommendation(matched));
@@ -224,7 +241,9 @@ function renderOutput(
   }
 
   // Memory ON
-  lines.push('> Memory を参照しているため、この subject 固有の過去資産が出力に反映されます。');
+  lines.push(
+    '> Memory を参照しているため、この subject 固有の過去資産が出力に反映されます。'
+  );
   lines.push('');
 
   if (excerpts.personalization && excerpts.personalization.trim().length > 0) {
@@ -263,7 +282,7 @@ function renderOutput(
   return lines.join('\n');
 }
 
-function genericRecommendation(matched: SoMRule | null): string {
+function genericRecommendation(matched: ManagementRule | null): string {
   if (!matched) return '- ルール未マッチ。辞書層と判定ルールの確認が必要';
   const action = String(matched.output.action ?? '');
   const map: Record<string, string[]> = {
@@ -281,17 +300,14 @@ function genericRecommendation(matched: SoMRule | null): string {
       '- 通常プログラム＋モニタリング強化',
       '- 週次で簡易レビュー',
     ],
-    standard_program: [
-      '- 標準プログラムで開始',
-      '- 月次で進捗レビュー',
-    ],
+    standard_program: ['- 標準プログラムで開始', '- 月次で進捗レビュー'],
   };
   const lines = map[action] ?? ['- ルール出力に従って次アクションを設計'];
   return lines.join('\n');
 }
 
 function personalizedRecommendation(
-  matched: SoMRule | null,
+  matched: ManagementRule | null,
   excerpts: ReturnType<typeof extractRelevantMemory>
 ): string {
   const generic = genericRecommendation(matched);
