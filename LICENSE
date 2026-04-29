@@ -1,0 +1,65 @@
+Context-Engine — Proprietary License
+
+Copyright (c) 2026 Takamune Watanabe. All rights reserved.
+
+This software and the accompanying files (collectively, the "Software")
+are the proprietary work of the copyright holder. The Software is made
+available solely for inspection and reference purposes via this public
+repository. No license, express or implied, is granted by virtue of the
+Software being publicly visible.
+
+1. Restrictions
+
+   Without the prior written permission of the copyright holder, you may
+   NOT:
+
+   (a) copy, reproduce, or republish the Software, in whole or in part;
+   (b) modify, adapt, translate, or create derivative works of the
+       Software;
+   (c) distribute, sublicense, sell, rent, lease, or otherwise transfer
+       the Software, in whole or in part, to any third party;
+   (d) use the Software, in whole or in part, in any commercial product
+       or service;
+   (e) remove or alter any proprietary notices, labels, or marks on the
+       Software;
+   (f) reverse engineer, decompile, or disassemble the Software, except
+       to the extent such activity is expressly permitted by applicable
+       law notwithstanding this restriction.
+
+2. Permitted Activities
+
+   You MAY:
+
+   (a) view the source code in this repository for personal study;
+   (b) link to this repository from public posts or articles;
+   (c) discuss the architecture and ideas presented in the Software,
+       provided that proper attribution is given.
+
+3. Future Open-Source Release
+
+   Portions of the core architecture (the "Core Layer") are planned for
+   release under an open-source license (MIT or Apache 2.0) at a future
+   phase of the project. Until such release is publicly announced by
+   the copyright holder, all rights are retained by the copyright holder
+   and the restrictions in Section 1 apply to the entire Software.
+
+4. Disclaimer of Warranty
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+   NON-INFRINGEMENT. THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY
+   CLAIM, DAMAGES, OR OTHER LIABILITY ARISING OUT OF OR IN CONNECTION
+   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+5. Trademark
+
+   "Context-Engine" is the project codename. Trademark applications are
+   in progress. No license to any trademark, service mark, trade name,
+   or logo is granted under this license.
+
+6. Contact
+
+   For licensing inquiries, please open an issue in this repository.
+
+End of License.

@@ -39,3 +39,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tenant data — only sample-tenant is public
+/data/tenants/*
+!/data/tenants/sample-tenant
+
+# internal docs (PLAN.md, DESIGN.md, etc.)
+/docs/internal/
+
+# editor / IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+
+# claude code local settings (launch.json is committed; settings.local.json is not)
+.claude/settings.local.json
+.claude/skills/
+
+# private notes (do NOT commit)
+PRIVATE_*.md
+NOTES_*.md
+*.local.*

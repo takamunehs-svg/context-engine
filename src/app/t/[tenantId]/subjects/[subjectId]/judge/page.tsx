@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { getTenantMeta } from "@/lib/fs/tenant";
 import { getSubjectProfile, loadMemory } from "@/lib/fs/subject";
-import { judge } from "@/lib/fs/management-judge";
+import {
+  AUDIENCE_LABELS,
+  buildJudgmentOutput,
+  type Audience,
+} from "@/lib/judgment-output";
 import { ArrowLeft, Sparkles, Zap, ChevronRight } from "lucide-react";
 import { JudgeForm } from "./judge-form";
 import { JudgeResult } from "./judge-result";
@@ -21,6 +25,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
     loadMemory(tenantId, subjectId),
   ]);
 
+  const audience = audienceFromSP(sp.audience);
   const submitted = "submitted" in sp;
   const facts = submitted
     ? {
@@ -31,7 +36,8 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
     : null;
 
   const offResult = facts
-    ? await judge({
+    ? await buildJudgmentOutput({
+        audience,
         tenant_id: tenantId,
         subject_id: subjectId,
         decision_type: "intervention_plan",
@@ -41,7 +47,8 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
     : null;
 
   const onResult = facts
-    ? await judge({
+    ? await buildJudgmentOutput({
+        audience,
         tenant_id: tenantId,
         subject_id: subjectId,
         decision_type: "intervention_plan",
@@ -93,6 +100,65 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
           </Link>
         </div>
       </header>
+
+      {/* この画面は何? */}
+      <section className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/50 p-6">
+        <p className="label-mono mb-3">この画面は何？</p>
+        <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
+          「今{" "}
+          <span className="text-[var(--fg)]">{profile.display_name}</span>{" "}
+          にこういう状況が出ました、どう動けばいい？」を{" "}
+          <span className="text-[var(--fg)]">AI に相談する画面</span>。 AI は{" "}
+          <span className="text-[var(--fg)]">ルールブック</span>
+          （業者の判断基準）と{" "}
+          <span className="text-[var(--fg)]">取扱い説明書</span>（
+          {profile.display_name} 専用の積み上げ）を見て答えます。
+        </p>
+        <p className="text-sm text-[var(--fg-muted)] leading-relaxed mt-3">
+          下で{" "}
+          <span className="text-[var(--fg)]">
+            Memory OFF と ON を並べて表示
+          </span>
+          し、「教科書通りの汎用回答」と「{profile.display_name}{" "}
+          専用に育った回答」の差を見せます。Memory が厚くなるほど、ON 側が{" "}
+          {profile.display_name} 固有に変化します。
+        </p>
+      </section>
+
+      {/* Audience selector */}
+      <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-6">
+        <p className="label-mono mb-2">AUDIENCE — 出力レベル</p>
+        <p className="text-xs text-[var(--fg-muted)] mb-4 leading-relaxed">
+          同じ判定でも「誰に見せるか」で Memory の出方が変わります。中間層
+          <code className="mx-1 text-[var(--fg)]">judgment-output.ts</code>
+          が audience 別にフィルタ（SPEC.md §5.4）。
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(["self", "team", "client", "demo"] as Audience[]).map((a) => {
+            const isCurrent = a === audience;
+            return (
+              <Link
+                key={a}
+                href={buildAudienceHref(
+                  `/t/${tenantId}/subjects/${subjectId}/judge`,
+                  sp,
+                  a,
+                )}
+                className={
+                  isCurrent
+                    ? "px-3 py-1.5 rounded-full text-xs font-mono border border-[var(--accent-border)] bg-[var(--accent-subtle)] text-[var(--accent-primary)]"
+                    : "px-3 py-1.5 rounded-full text-xs font-mono border border-[var(--border-color)] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--fg-muted)]"
+                }
+              >
+                <span className="text-[var(--fg)]">{a}</span>
+                <span className="ml-1.5 text-[var(--fg-subtle)]">
+                  {AUDIENCE_LABELS[a]}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Memory depth */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
@@ -167,9 +233,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
               subtitle="汎用出力"
               caption="辞書 + ルール + 当該事実のみ。subject 固有の積層は使わない。"
               icon={<Zap className="h-4 w-4" strokeWidth={1.5} />}
-              rendered={offResult.rendered}
-              ruleId={offResult.rule_match.matched_rule_id}
-              memoryCounts={offResult.memory_referenced.counts}
+              output={offResult}
             />
             <JudgeResult
               variant="on"
@@ -177,9 +241,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
               subtitle="subject 固有化"
               caption="上記 + memory/* の personalization・failures・experiences を Context に積む。"
               icon={<Sparkles className="h-4 w-4" strokeWidth={1.5} />}
-              rendered={onResult.rendered}
-              ruleId={onResult.rule_match.matched_rule_id}
-              memoryCounts={onResult.memory_referenced.counts}
+              output={onResult}
             />
           </div>
         </section>
@@ -233,4 +295,25 @@ function numFromSP(v: string | string[] | undefined): number | undefined {
   if (v === undefined || Array.isArray(v) || v === "") return undefined;
   const n = Number(v);
   return Number.isNaN(n) ? undefined : n;
+}
+
+function audienceFromSP(v: string | string[] | undefined): Audience {
+  const cand = Array.isArray(v) ? v[0] : v;
+  if (cand === "team" || cand === "client" || cand === "demo") return cand;
+  return "self";
+}
+
+function buildAudienceHref(
+  base: string,
+  sp: Record<string, string | string[] | undefined>,
+  audience: Audience,
+): string {
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (k === "audience") continue;
+    if (Array.isArray(v)) v.forEach((vi) => params.append(k, vi));
+    else if (v !== undefined) params.append(k, v);
+  }
+  params.set("audience", audience);
+  return `${base}?${params.toString()}`;
 }
