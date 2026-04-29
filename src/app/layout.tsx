@@ -120,7 +120,7 @@ function Footer() {
               Append-only is non-negotiable.
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-6 border-t border-[var(--border-color)] text-xs font-mono text-[var(--fg-subtle)]">
-              <span>© 2026 渡邊鷹宗</span>
+              <span>© 2026 Takamune Watanabe</span>
               <span>v0.1.0</span>
               <span className="ml-auto flex gap-4">
                 <span>SPEC.md</span>

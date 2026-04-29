@@ -8,6 +8,7 @@ import { AddMeasurementEventForm } from "./add-measurement-event-form";
 import { AddMemoryDecisionForm } from "./add-memory-decision-form";
 import { AddMemoryFailureForm } from "./add-memory-failure-form";
 import { AddMemoryExperienceForm } from "./add-memory-experience-form";
+import { summarizeEvent } from "@/lib/event-summary";
 
 interface PageProps {
   params: Promise<{ tenantId: string; subjectId: string }>;
@@ -140,29 +141,57 @@ export default async function SubjectPage({ params }: PageProps) {
             {events
               .slice()
               .reverse()
-              .map((e) => (
-                <li key={e.id} className="relative">
-                  <span className="absolute -left-[29px] top-3 h-2 w-2 rounded-full bg-[var(--accent-primary)] shadow-[0_0_8px_var(--accent-primary)]" />
-                  <div className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-full border border-[var(--border-color)] px-2 py-0.5 text-[10px] font-mono text-[var(--fg-muted)]">
-                          {e.event_type}
-                        </span>
-                        <span className="text-xs font-mono text-[var(--fg-muted)]">
-                          {e.recorded_at}
+              .map((e) => {
+                const summary = summarizeEvent(e);
+                return (
+                  <li key={e.id} className="relative">
+                    <span className="absolute -left-[29px] top-3 h-2 w-2 rounded-full bg-[var(--accent-primary)] shadow-[0_0_8px_var(--accent-primary)]" />
+                    <div className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full border border-[var(--border-color)] px-2 py-0.5 text-[10px] font-mono text-[var(--fg-muted)]">
+                            {e.event_type}
+                          </span>
+                          <span className="text-xs font-mono text-[var(--fg-muted)]">
+                            {summary.date}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-[var(--fg-subtle)]">
+                          {e.id}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-[var(--fg-subtle)]">
-                        {e.id}
-                      </span>
+
+                      {summary.notes && (
+                        <p className="text-sm text-[var(--fg)] leading-relaxed mb-3">
+                          {summary.notes}
+                        </p>
+                      )}
+
+                      {summary.metrics.length > 0 && (
+                        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--fg-muted)] mb-3">
+                          {summary.metrics.map((m) => (
+                            <li key={m.key} className="font-mono">
+                              <span className="text-[var(--fg-subtle)]">{m.key}</span>
+                              <span className="mx-1 text-[var(--fg-subtle)]">:</span>
+                              <span className="text-[var(--fg)]">{m.value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <details className="group">
+                        <summary className="cursor-pointer text-[10px] font-mono text-[var(--fg-subtle)] hover:text-[var(--fg-muted)] select-none list-none flex items-center gap-1">
+                          <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+                          Raw を見る
+                        </summary>
+                        <pre className="mt-2 text-[11px] bg-[var(--bg)] border border-[var(--border-color)] rounded p-3 overflow-x-auto font-mono text-[var(--fg-muted)] leading-relaxed">
+                          {JSON.stringify(e.context, null, 2)}
+                        </pre>
+                      </details>
                     </div>
-                    <pre className="text-[11px] bg-[var(--bg)] border border-[var(--border-color)] rounded p-3 overflow-x-auto font-mono text-[var(--fg-muted)] leading-relaxed">
-                      {JSON.stringify(e.context, null, 2)}
-                    </pre>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
           </ol>
         </TabsContent>
 

@@ -82,8 +82,8 @@ const layers = [
   {
     code: "01",
     en: "Dictionary Layer",
-    jp: "辞書層 — 普遍知識",
-    desc: "判定基準・閾値・参照モデル。テナント内で1つ・年単位編集。AI は読み取り専用。",
+    jp: "ルールブック",
+    desc: "業者が業務で使う「判断基準書」。学校の成績ルール、保険の料金表、就業規則のように「この条件ならこう動く」を表にしたもの。1度作ったら年単位で固定。AI は読むだけ。",
     nature: "永続",
     edit: "年単位",
     icon: FileText,
@@ -91,8 +91,8 @@ const layers = [
   {
     code: "02",
     en: "Activity Layer",
-    jp: "活動層 — 現場ログ",
-    desc: "イベント記録・帳簿。append-only。補正は新エントリで上書き、既存行は変更しない。",
+    jp: "履歴ログ",
+    desc: "対象（クライアント・選手・生徒）と過去にあったことを時系列で全部記録。病院のカルテ、銀行の取引履歴、LINE のトーク履歴と同じ。書き換え禁止、起きたことは下に追記するだけ。",
     nature: "append-only",
     edit: "セッション毎",
     icon: Layers,
@@ -100,8 +100,8 @@ const layers = [
   {
     code: "03",
     en: "Management Layer",
-    jp: "管理層 — 判定・計画",
-    desc: "判定・計画・ルール。版管理（v1, v2 + superseded_by）。Memory を参照して固有化。",
+    jp: "AI 相談窓口",
+    desc: "「今こういう状況、どう動けばいい？」を AI に聞く画面。AI はルールブックと取扱い説明書を見て答える。版管理つき（v1, v2 …）で、過去の判定も後から追える。",
     nature: "版管理",
     edit: "週次〜月次",
     icon: GitBranch,
@@ -109,8 +109,8 @@ const layers = [
   {
     code: "04",
     en: "Episodic Memory",
-    jp: "エピソード記憶 — 固有化資産",
-    desc: "判断・失敗・気づき。subject 別に積層・append-only。最も対象固有化する層。",
+    jp: "取扱い説明書",
+    desc: "ベテラン担当者が頭に持っている「この対象の特徴・反応パターン」をデータ化したもの。美容師が覚えてる「この客はアレルギーあり」、営業マンが覚えてる「この社長はゴルフ好き」のような知見。使うほど厚くなる。",
     nature: "subject別 / append-only",
     edit: "都度",
     icon: Brain,
@@ -127,17 +127,19 @@ function FourLayers() {
         <div className="mb-16">
           <p className="label-mono mb-4">FOUR LAYERS</p>
           <h2 className="text-3xl md:text-4xl font-light tracking-tight max-w-3xl">
-            <span className="text-[var(--fg)]">辞書層</span>
+            <span className="text-[var(--fg)]">ルールブック</span>
             <span className="text-[var(--fg-muted)]"> × </span>
-            <span className="text-[var(--fg)]">活動層</span>
+            <span className="text-[var(--fg)]">履歴ログ</span>
             <span className="text-[var(--fg-muted)]"> × </span>
-            <span className="text-[var(--fg)]">管理層</span>
+            <span className="text-[var(--fg)]">AI 相談窓口</span>
             <span className="text-[var(--fg-muted)]"> × </span>
-            <span className="text-[var(--fg)]">エピソード記憶</span>
+            <span className="text-[var(--fg)]">取扱い説明書</span>
           </h2>
           <p className="mt-4 text-[var(--fg-muted)] max-w-2xl text-base leading-relaxed">
-            責務が異なる4つの層を、ファイル配置として表現する。スキーマはテナント内で共通、
-            値だけが subject 別に並列に積層する。
+            業務に必要な 4 つの要素を、ファイルとして管理する仕組み。業者が使う
+            <span className="text-[var(--fg)]">ルールブック</span>は共通のまま、
+            対象（クライアント・選手・生徒）ごとの<span className="text-[var(--fg)]">履歴</span>と
+            <span className="text-[var(--fg)]">取扱い説明書</span>だけが並列に積み上がる。
           </p>
         </div>
 

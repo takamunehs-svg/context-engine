@@ -33,9 +33,14 @@ export async function judge(input: JudgeInput): Promise<JudgeOutput> {
 
   // 3. Memory 読み込み（ON でも OFF でも件数は表示する）
   const memory = await loadMemory(tenant_id, subject_id);
-  const memoryExcerpts = use_memory
+  const memoryExcerpts: ReturnType<typeof extractRelevantMemory> = use_memory
     ? extractRelevantMemory(memory, matched, current_facts)
-    : {};
+    : {
+        personalization: undefined,
+        failure_patterns: [],
+        relevant_decisions: [],
+        strong_experiences: [],
+      };
 
   // 4. 出力レンダリング
   const rendered = renderOutput(
