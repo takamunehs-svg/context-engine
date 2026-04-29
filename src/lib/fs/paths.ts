@@ -25,7 +25,7 @@ export const paths = {
   dictionarySchema: (tenantId: string) =>
     path.join(DATA_ROOT, 'tenants', tenantId, 'dictionary', '_schema.yaml'),
 
-  // Activity Layer（旧 SoA）
+  // Activity Layer
   activitySchema: (tenantId: string) =>
     path.join(DATA_ROOT, 'tenants', tenantId, 'activity', '_schema.yaml'),
   activityEventsDir: (tenantId: string) =>
@@ -52,7 +52,7 @@ export const paths = {
       `${subjectId}.md`
     ),
 
-  // Management Layer（旧 SoM）
+  // Management Layer
   managementSchema: (tenantId: string) =>
     path.join(DATA_ROOT, 'tenants', tenantId, 'management', '_schema.yaml'),
   managementRulesDir: (tenantId: string) =>
