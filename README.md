@@ -105,8 +105,17 @@ Phase 2+: Core layer planned for open-source release (MIT or Apache 2.0).
 
 ---
 
+## Documentation
+
+- 📘 [SPEC.md](SPEC.md) — Architecture and design specification
+- 📗 [AGENTS.md](AGENTS.md) — AI agent working rules
+- 🇯🇵 [SPEC_ja.md](SPEC_ja.md) / [AGENTS_ja.md](AGENTS_ja.md) — Japanese versions
+
+---
+
 ## Internal documentation
 
 Internal planning docs (strategic decisions, design history) are kept
 private under proprietary business strategy. Public documentation is
-limited to `README.md`, `SPEC.md`, and `AGENTS.md`.
+limited to `README.md`, `SPEC.md`, `AGENTS.md`, and their Japanese
+counterparts (`SPEC_ja.md`, `AGENTS_ja.md`).

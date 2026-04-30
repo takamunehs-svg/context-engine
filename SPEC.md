@@ -1,242 +1,243 @@
 # context-engine SPEC.md
 
-> 設計思想とデータモデルの仕様書。実装と設計判断の根拠。
-> 関連：`AGENTS.md`（作業ルール）/ internal planning docs（進捗・意思決定 — public repo には含まれない）
+> Specification for the design philosophy and data model. The basis for implementation and design decisions.
+> Related: `AGENTS.md` (working rules) / internal planning docs (progress and decisions — not in public repo)
 
 ---
 
-## 0. 階層モデル（最重要・最初に読む）
+## 0. Hierarchy model (most important — read first)
 
-context-engine は **3階層** で動く。混同しないこと。
+context-engine runs on **three tiers**. Do not conflate them.
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ context-engine（メタプラットフォーム = 汎用フレーム）        │
+│ context-engine (the meta-platform = generic frame)   │
 └──────────────────────┬──────────────────────────────┘
                        │
         ┌──────────────▼──────────────┐
-        │ Tenant（テナント = N社）          │
-        │ フレームを使うコンサル業者・        │
-        │ トレーナー・治療院・S&Cチーム等    │
+        │ Tenant (e.g., Firm N)        │
+        │ The consulting firms,        │
+        │ trainers, clinics, S&C       │
+        │ teams that adopt the frame.  │
         └──────────────┬──────────────┘
                        │
        ┌───────────────┼───────────────┐
        ▼               ▼               ▼
    Subject A       Subject B       Subject C
-   （N社のクライアント・選手・学習者）
+   (Firm N's clients, athletes, learners)
 ```
 
-### 各層の固有化
+### How each layer specializes
 
-| 層 | 何を保持 | 粒度 | A/B/C で違うか |
+| Layer | What it holds | Granularity | Differs across A/B/C? |
 |---|---|---|---|
-| **辞書層** | 判定基準・閾値・参照モデル | **テナント内で1つ** | ❌ 共通 |
-| **Activity Layer** | 現場活動ログ | **subject 別** | ⭕ 値が違う |
-| **Management Layer** | 判定・計画 | **subject 別** | ⭕ 値が違う |
-| **Memory** | 判断・失敗・気づき・固有化情報 | **subject 別** | ⭕⭕⭕ **最も違う** |
+| **Dictionary Layer** | Criteria, thresholds, reference models | **One per tenant** | ❌ Shared |
+| **Activity Layer** | Field-activity logs | **Per subject** | ⭕ Values differ |
+| **Management Layer** | Decisions and plans | **Per subject** | ⭕ Values differ |
+| **Memory** | Decisions, failures, insights, subject-specific information | **Per subject** | ⭕⭕⭕ **Differs the most** |
 
-### 核心メッセージ
+### The core message
 
-**「概念フレーム（辞書・Activity Layer・Management Layer・Memory のスキーマ）はテナント内で1つ。A/B/C別の値・履歴・Memoryエントリだけが並列に積層していく。だから混ざらず崩れず、しかも subject ごとにどんどんパーソナライズされる」**
+**"The conceptual frame (the schemas of Dictionary / Activity / Management / Memory) lives once per tenant. Only the per-subject values, history, and Memory entries accumulate in parallel. So nothing mixes, nothing breaks, and yet each subject becomes more and more personalized."**
 
-これが「使えば使うほど質の上がる構造」の正体。N社が10社のクライアントを抱えても、フレームは1セットのまま。新しいクライアント D を取れば、辞書とスキーマはそのまま流用、D の Memory だけゼロから始まる。
+That is the real mechanism behind "the more you use it, the better it gets." Even if Firm N takes on ten clients, the frame stays as one set. When a new client D arrives, the dictionary and schemas are reused as-is and only D's Memory starts from zero.
 
 ---
 
-## 1. 設計の核
+## 1. The design core
 
-### 1.1 一行で
+### 1.1 In one sentence
 
-**3層構造（辞書層 / Activity Layer / Management Layer）に subject 別の Episodic Memory が積層するほど、AI がその subject 専用の協働相手に固有化していく — これをファイルシステム上で表現する。**
+**As Episodic Memory accumulates per subject on top of the 3-layer architecture (Dictionary / Activity / Management Layer), the AI specializes into a collaborator dedicated to that subject — and we express this on the file system.**
 
-### 1.2 4つの源流
+### 1.2 The four source streams
 
-| 源流 | 提供する設計要素 |
+| Source | Design contribution |
 |---|---|
-| 杉本『データモデリングでドメインを駆動する』 | 3層構造の責務分離・残管理・ビジネスルール疎結合化 |
-| Muratcan「File System Is the New Database」 | ファイルシステム First・Progressive Disclosure・Format-Function Mapping・Episodic Memory |
-| 梶谷『生成AI時代を勝ち抜く事業・組織のつくり方』 | 使うほど質が上がる構造・MOAT・UX原則 |
-| Choudary/Parker/Van Alstyne『Platform Revolution』 | Core Interaction（Participants + Value Unit + Filter）・Pull/Facilitate/Match・End-to-End Principle・Modularity・Network Effects 4種・Curation・Launch 8戦略・Openness 3階層・市場失敗4原因 + Lessig 4ツール・lifecycle 別 Metrics・ニッチ特化戦略 |
+| Sugimoto, *Domain-Driven Data Modeling* (Japanese: 杉本『データモデリングでドメインを駆動する』) | The 3-layer responsibility split, the buffer concept, business-rule decoupling |
+| Muratcan, *The File System Is the New Database* | File-system first, Progressive Disclosure, Format-Function Mapping, Episodic Memory |
+| Kajiya, *How to build a business and an organization in the generative-AI era* (Japanese: 梶谷『生成AI時代を勝ち抜く事業・組織のつくり方』) | The "gets better with use" structure, MOAT, UX principles |
+| Choudary, Parker, Van Alstyne, *Platform Revolution* | Core Interaction (Participants + Value Unit + Filter), Pull/Facilitate/Match, End-to-End Principle, Modularity, the four kinds of network effect, Curation, the eight Launch strategies, three Openness axes, four causes of market failure + Lessig's four tools, lifecycle metrics, and niche-specialization strategy |
 
-### 1.3 6つの非交渉原則
+### 1.3 The six non-negotiable principles
 
-1. **ファイルシステム First** — データの正本は MD/JSONL/YAML。DB はインデックスや認証等の補助役
-2. **3層責務分離** — 辞書層 / Activity Layer / Management Layer を混ぜない。Memory はそれらと独立
-3. **Append-only は非交渉** — `activity/events/`, `memory/*/`* は UPDATE/DELETE 禁止。補正は新エントリ
-4. **Progressive Disclosure 2 hops** — 最大2ホップで情報に到達できる構造（ROUTING → MODULE → DATA）
-5. **AI-Neutral** — Claude/GPT/Gemini/自社AI のいずれでも動く plain text
-6. **Context Engineering > Prompt Engineering** — 「AIが正しい判断をするために何の情報が必要で、それをどう構造化すれば実際に使うか」
+1. **File-system first** — the canonical record is MD/JSONL/YAML. The DB plays only supporting roles such as indexing or auth.
+2. **3-layer responsibility split** — never mix Dictionary / Activity / Management. Memory is independent of all three.
+3. **Append-only is non-negotiable** — `activity/events/` and `memory/*/*` cannot be UPDATED or DELETED. Corrections become new entries.
+4. **Progressive Disclosure in two hops** — at most two hops to reach any information (ROUTING → MODULE → DATA).
+5. **AI-Neutral** — the same plain text must work with Claude, GPT, Gemini, or a self-hosted model.
+6. **Context Engineering > Prompt Engineering** — "what information does the AI need to make a correct decision, and how should it be structured so the AI actually uses it?"
 
 ---
 
-### 1.4 Core Interaction（プラットフォーム設計の起点）
+### 1.4 Core Interaction (the starting point of platform design)
 
-**プラットフォームは「複数の interaction を最初から作る」のではなく、1つの Core Interaction を起点に、後から interaction を重ねて成長する**（Platform Revolution Ch.3）。LinkedIn も最初は「professionals connecting」のみで始まり、後から groups / recruiters / posts を重ねた。
+**A platform does not start by building several interactions at once. It starts from a single Core Interaction and layers more on later** (Platform Revolution Ch.3). LinkedIn began only with "professionals connecting" and added groups, recruiters, and posts later.
 
-**Core Interaction の3要素**：
+**The three components of a Core Interaction:**
 
 ```
-Participants（参加者）+ Value Unit（価値単位）+ Filter（フィルタ）→ Core Interaction
+Participants + Value Unit + Filter → Core Interaction
 ```
 
-| 要素 | 意味 | context-engine での具体 |
+| Component | Meaning | What it is in context-engine |
 |---|---|---|
-| Participants | Producer（価値創造側）と Consumer（価値消費側）| Producer = テンプレ作成者、Consumer = テナント（コンサル業者）|
-| Value Unit | Producer が作る、Consumer が消費する単位 | 業界テンプレ（辞書スキーマ + 活動スキーマ + Management ルール一式）|
-| Filter | Value Unit を適切な Consumer に届けるアルゴリズム | 業種・規模・専門領域・既存テンプレ評価 |
+| Participants | Producer (creates value) and Consumer (consumes value) | Producer = template author; Consumer = tenant (a consulting firm) |
+| Value Unit | The unit a Producer creates and a Consumer consumes | An industry template (a Dictionary schema + an Activity schema + a set of Management rules) |
+| Filter | The algorithm that delivers a Value Unit to the right Consumer | Industry, scale, specialty, existing template ratings |
 
-### context-engine の Core Interaction（決定）
+### The Core Interaction of context-engine (decided)
 
-**A1 = テンプレ作成者 → テナント（コンサル業者）の業界テンプレ流通** をプラットフォーム本体の Core Interaction に確定する（D-009 / 2026-04-29）。
+**A1 = the flow of industry templates from template authors to tenants (consulting firms)** is fixed as the platform's Core Interaction (D-009 / 2026-04-29).
 
-| 候補 | Producer | Consumer | Value Unit | プラットフォーム性 | 位置付け |
+| Candidate | Producer | Consumer | Value Unit | Platform-ness | Position |
 |---|---|---|---|---|---|
-| **A1（採用）** | テンプレ作成者 | テナント | 業界テンプレ | ◎ | **Core Interaction** |
-| A2 | テナント | subject（クライアント）| ガイダンス・判定 | ✕（パイプライン的）| **テナント内ツール**（プラットフォーム外） |
-| A3 | テナント（ピア）| テナント（ピア）| 実証済み personalization パターン | ○ | **Phase 3+ で重ねる第二 interaction** |
+| **A1 (adopted)** | Template author | Tenant | Industry template | ◎ | **Core Interaction** |
+| A2 | Tenant | Subject (client) | Guidance and decisions | ✕ (a pipeline) | **Tenant-internal tool** (off-platform) |
+| A3 | Tenant (peer) | Tenant (peer) | Validated personalization patterns | ○ | **Second interaction layered in Phase 3+** |
 
-### Phase 別の段階展開（OpenTable / redBus 型 Single-side 戦略）
+### Phased rollout (Single-side strategy à la OpenTable / redBus)
 
-OpenTable は最初レストラン向けの予約管理ソフト（A2 相当）として価値を出し、レストランが集まってから消費者向け予約プラットフォーム（A1 に近い）に展開した。context-engine も同型：
+OpenTable first delivered value as a reservation manager for restaurants (close to A2). Once enough restaurants were on board, it expanded to a consumer-facing reservation platform (closer to A1). context-engine takes the same path:
 
-- **Phase 0-1**：A2（テナント内ツール）として価値を完成 + 健康指導テンプレを seeding として同梱（A1 種まき）
-- **Phase 2**：A1 を本格化（テンプレマーケット + curation 機構）
-- **Phase 3+**：A3（ピア間メソッド共有）を重ねる
+- **Phase 0–1**: complete the value of A2 (the tenant-internal tool) and bundle the health-coaching template as A1 seeding.
+- **Phase 2**: scale A1 in earnest (template marketplace + curation mechanism).
+- **Phase 3+**: layer A3 (peer-to-peer methodology sharing).
 
-**A2 をプラットフォーム外と位置付ける理由**：A2 はテナント内で完結し、ネットワーク効果が発生しない。これをプラットフォームの Core にすると context-engine はツールに留まり、licensing-based growth が失われる。
+**Why A2 is positioned off-platform**: A2 is self-contained inside a tenant and produces no network effects. Putting it at the Core would freeze context-engine as a tool and forfeit licensing-based growth.
 
 ---
 
-### 1.5 Pull / Facilitate / Match の3機能（Ch.3）
+### 1.5 The three key functions: Pull / Facilitate / Match (Ch.3)
 
-Core Interaction を成立させるための3つの key function：
+Three key functions make a Core Interaction stand up:
 
-| 機能 | 役割 | context-engine での設計責任 |
+| Function | Role | Design responsibility in context-engine |
 |---|---|---|
-| **Pull** | Producer / Consumer をプラットフォームに引きつける | chicken-or-egg 解消、feedback loop、外部ネットワーク便乗 |
-| **Facilitate** | interaction を簡単にする（または品質のために難しくする）| 創作ツール、使用障壁の上下、curation |
-| **Match** | 適切な Producer / Consumer をマッチング | データ駆動マッチング、検索、推薦 |
+| **Pull** | Attract Producers and Consumers to the platform | Resolve chicken-or-egg, build feedback loops, piggyback on external networks |
+| **Facilitate** | Make interactions easy (or deliberately hard, for quality) | Authoring tools, the level of friction, curation |
+| **Match** | Connect the right Producer to the right Consumer | Data-driven matching, search, recommendations |
 
-**現状の弱点**：context-engine 設計は **Match が弱い**。テンプレ⇄業種・規模の自動マッチング、ピア間パターン共有のマッチング、Memory entry の状況依存マッチングが未設計。Phase 1-2 で本格設計が必要（D-009 派生）。
+**Current weakness**: the context-engine design is **light on Match**. Auto-matching of templates ↔ industry/scale, peer-pattern sharing, and situational matching of Memory entries are not yet designed. Phase 1–2 must address them in earnest (a derivative of D-009).
 
 ---
 
-### 1.6 End-to-End Principle と Modularity（Ch.3）
+### 1.6 End-to-End Principle and Modularity (Ch.3)
 
-> *core platform should be stable, simple, low-variety; application-specific features at the edge*
+> *the core platform should be stable, simple, low-variety; application-specific features at the edge*
 
-**core / edge の境界**：
+**Boundary between core and edge:**
 
-| 層 | 性質 | 該当物 |
+| Layer | Character | What it includes |
 |---|---|---|
-| **Core platform**（薄く・stable・low variety）| 全テナント共通の基盤 | 3層+Memory の責務分離・Append-only ルール・JSONL/YAML/MD フォーマット仕様・Progressive Disclosure 2hops・テンプレ適用機構・ファイルアクセス層 |
-| **Edge**（high variety・進化）| 業界・テナント固有 | 業界テンプレ（辞書スキーマ・活動イベント種別・Management ルール）・内部分類記号（C1-C5・A-G・R0-R3 等）・Memory のパターン |
+| **Core platform** (thin, stable, low-variety) | Foundation shared by every tenant | The 3-layer + Memory responsibility split, the append-only rule, the JSONL/YAML/MD format spec, Progressive Disclosure 2-hops, the template-application mechanism, the file-access layer |
+| **Edge** (high-variety, evolving) | Industry- and tenant-specific | Industry templates (Dictionary schema, Activity event types, Management rules), internal classification codes (`C1`–`C5`, `A`–`G`, `R0`–`R3`, etc.), Memory patterns |
 
-**API としてのファイル仕様**：context-engine の「ファイルシステム First」は実は Modularity と整合する。**スキーマ・ルール定義・メモリ形式が安定 API** であれば、第三者がテンプレを独立開発できる。
+**File specs as API**: context-engine's "file-system first" stance is consistent with Modularity. **Once schemas, rule definitions, and Memory formats are stable APIs**, third parties can develop templates independently.
 
-**過去の意思決定との整合**：
-- "Industry-specific classification codes do not belong in the meta-platform" — recorded as a decision in internal planning documents
-- Per advice from a patent attorney (April 2026): "industry-specific classification codes belong inside the template" — fully aligned
+**Alignment with prior decisions:**
+- "Industry-specific classification codes do not belong in the meta-platform" — recorded as a decision in internal planning documents.
+- Per advice from a patent attorney (April 2026): "industry-specific classification codes belong inside the template" — fully aligned.
 
 ---
 
-### 1.7 Network Effects 4種と Curation（Ch.2）
+### 1.7 The four kinds of network effect, and curation (Ch.2)
 
-**4種のネットワーク効果**：
+**The four kinds of network effect:**
 
-| 種類 | 定義 | context-engine での例 |
+| Type | Definition | Example in context-engine |
 |---|---|---|
-| Same-side positive | 同サイドのユーザー増加で価値増 | テンプレ作成者が増えるほど作成者間の知見交換価値増 |
-| Same-side negative | 同サイドが多すぎて価値低下 | 似たテンプレが多すぎて選択困難（Phase 2 課題）|
-| Cross-side positive | 反対サイドの増加で価値増 | テンプレ作成者が増えるほどテナントの選択肢増、テナントが増えるほど作成者の対象拡大 |
-| Cross-side negative | 反対サイドが多すぎて価値低下 | 低品質テンプレが氾濫してテナントが離脱（Phase 2 課題）|
+| Same-side positive | More users on the same side raises value | The more template authors, the more knowledge exchange among authors |
+| Same-side negative | Too many on the same side lowers value | Too many similar templates make selection painful (a Phase 2 problem) |
+| Cross-side positive | More on the opposite side raises value | More authors → more options for tenants; more tenants → more reach for authors |
+| Cross-side negative | Too many on the opposite side lowers value | A flood of low-quality templates drives tenants away (a Phase 2 problem) |
 
-**Curation = ポジティブネットワーク効果を生む唯一の方法**：
-- スケールすると質が劣化する（Chatroulette 失敗例：登録不要・無制御で Naked Hairy Men 問題が起きて崩壊）
-- OkCupid 階層マッチング、Sittercity の認証は Curation の好例
-- context-engine では **Phase 0-1 はユーザー単独 producer なので curation 不要**、**Phase 2 で本格化**（D-011）
+**Curation = the only way to keep network effects positive:**
+- Quality degrades with scale (the Chatroulette failure: no registration, no controls, the "Naked Hairy Men" problem collapsed it).
+- OkCupid's tiered matching and Sittercity's verification are good examples of curation.
+- For context-engine, **Phase 0–1 has a single Producer (the founder) so curation is unnecessary; Phase 2 introduces it in earnest** (D-011).
 
 ---
 
-## 2. 3層 + Memory の責務
+## 2. Responsibilities of the 3 layers + Memory
 
-### 2.1 辞書層（Dictionary）
+### 2.1 Dictionary Layer
 
-**普遍原則・判定基準・参照モデル**。ルールそのもの。
+**Universal principles, decision criteria, reference models.** The rules themselves.
 
-| 観点 | 内容 |
+| Aspect | Content |
 |---|---|
-| 編集頻度 | 年単位 |
-| 編集権限 | 業界テンプレ作成者・テナント管理者のみ。hookでブロック |
-| ファイル形式 | MD（説明文） + YAML（構造化値） |
-| 例 | 分類体系・判定閾値・処方上限・参照ガイドライン |
-| append-only か | NO（版管理） |
+| Edit cadence | Yearly |
+| Edit authority | Industry-template authors and tenant administrators only; blocked by hooks |
+| File format | MD (descriptions) + YAML (structured values) |
+| Examples | Classification systems, decision thresholds, prescription caps, reference guidelines |
+| Append-only? | No (version-controlled) |
 
-**重要**：内部分類記号（C1-C5・A-G 等）はテナントの辞書層に閉じる。メタプラットフォームには持ち込まない。
+**Important**: internal classification codes (`C1`–`C5`, `A`–`G`, etc.) are confined to the tenant's Dictionary Layer. They must not be carried into the meta-platform.
 
 ### 2.2 Activity Layer
 
-**現場活動の記録・帳簿**。観察・計測・記録。
+**Field-activity records and ledger.** Observation, measurement, recording.
 
-| 観点 | 内容 |
+| Aspect | Content |
 |---|---|
-| 編集頻度 | セッション毎・日次 |
-| 編集権限 | 現場担当者 |
-| ファイル形式 | JSONL（events）+ MD（subject プロフィール） |
-| 例 | セッション記録・測定値・問診票・指導記録 |
-| append-only か | **YES（非交渉）**。補正は新イベント |
+| Edit cadence | Per session, daily |
+| Edit authority | Field operators |
+| File format | JSONL (events) + MD (subject profiles) |
+| Examples | Session records, measurements, intake forms, coaching notes |
+| Append-only? | **Yes (non-negotiable)**. Corrections become new events |
 
-**残（バッファー）の概念**（杉本本由来）：業務機能の最小単位は「残」を核に成立する。発生イベント・解消イベントを紐付ける。
+**The "buffer" concept** (from Sugimoto): the smallest unit of business function is built around a buffer — a paired "occurrence event" and "resolution event."
 
-> **杉本本由来**：本層は同書の System of Activity (SoA) に対応する（D-007 で汎用語にリブランド）。
+> **From Sugimoto**: this layer corresponds to the *System of Activity (SoA)* in the same book; rebranded to a generic English term in D-007.
 
 ### 2.3 Management Layer
 
-**判定・計画・ルール**。次アクションを決める層。
+**Decisions, plans, and rules.** The layer that determines the next action.
 
-| 観点 | 内容 |
+| Aspect | Content |
 |---|---|
-| 編集頻度 | 週次〜月次 |
-| 編集権限 | マネージャー |
-| ファイル形式 | MD（判定文書）+ YAML（ルール定義） |
-| 例 | プログラム設計・経過判定・介入ミックス |
-| append-only か | NO（**版管理**：v1, v2... + superseded_by） |
+| Edit cadence | Weekly to monthly |
+| Edit authority | Managers |
+| File format | MD (decision documents) + YAML (rule definitions) |
+| Examples | Program design, progress assessment, intervention mix |
+| Append-only? | No (**version-controlled**: v1, v2, ... with `superseded_by`) |
 
-**多次元・バージョン・ビジネスルール**（杉本本由来）：Management LayerはActivity Layerと違い、要約・キューブ・計画の変遷を扱う。ビジネスルールは依存性注入・テーブル駆動でActivity Layerから疎結合化。
+**Multi-dimensional, versioned, business rules** (from Sugimoto): unlike the Activity Layer, the Management Layer handles summaries, cubes, and the evolution of plans. Business rules are decoupled from the Activity Layer via dependency injection and table-driven design.
 
-> **杉本本由来**：本層は同書の System of Management (SoM) に対応する（D-007 で汎用語にリブランド）。
+> **From Sugimoto**: this layer corresponds to the *System of Management (SoM)* in the same book; rebranded to a generic English term in D-007.
 
 ### 2.4 Episodic Memory
 
-**横断的な学習・判断履歴**。**最も対象固有化する層**。
+**Cross-cutting learning and decision history.** **The layer that specializes the most.**
 
-| ファイル | 形式 | 内容 |
+| File | Format | Content |
 |---|---|---|
-| `decisions.jsonl` | JSONL | 判断・理由・代替案・結果 |
-| `failures.jsonl` | JSONL | 失敗・根本原因・予防策 |
-| `experiences.jsonl` | JSONL | 気づき（emotional_weight 1-10） |
-| `personalization.md` | MD | 対象固有の反応パターン・効いた介入・コミュ特性 |
+| `decisions.jsonl` | JSONL | Decisions, rationale, alternatives, outcomes |
+| `failures.jsonl` | JSONL | Failures, root causes, prevention measures |
+| `experiences.jsonl` | JSONL | Insights with `emotional_weight` (1–10) |
+| `personalization.md` | MD | Subject-specific reaction patterns, interventions that worked, communication preferences |
 
-| 観点 | 内容 |
+| Aspect | Content |
 |---|---|
-| append-only か | **YES（非交渉）** |
-| 配置 | `memory/{subject_id}/` 配下（subject 別に分離） |
-| Management Layer 判定時の役割 | 必ず先に Read される。出力に差を生む |
+| Append-only? | **Yes (non-negotiable)** |
+| Location | Under `memory/{subject_id}/` (separated per subject) |
+| Role at Management Layer decision time | Always read first; produces the difference in output |
 
 ---
 
-## 3. データモデル — ファイル配置
+## 3. Data model — file layout
 
-### 3.1 リポジトリ構造（テナント単位）
+### 3.1 Repository structure (per tenant)
 
 ```
 {tenant-root}/
-├── INSTRUCTIONS/                    … Progressive Disclosure 3層
-│   ├── ROUTING.md                   …  Level 1: 「どのモジュールを読むか」
-│   ├── DICTIONARY.md                …  Level 2: 辞書モジュール命令
-│   ├── ACTIVITY.md                       …  Level 2: Activity Layerモジュール命令
-│   ├── MANAGEMENT.md                       …  Level 2: Management Layerモジュール命令
-│   └── MEMORY.md                    …  Level 2: Memoryモジュール命令
+├── INSTRUCTIONS/                    … the three Progressive Disclosure tiers
+│   ├── ROUTING.md                   …  Level 1: "which module to read"
+│   ├── DICTIONARY.md                …  Level 2: dictionary module instructions
+│   ├── ACTIVITY.md                  …  Level 2: Activity Layer module instructions
+│   ├── MANAGEMENT.md                …  Level 2: Management Layer module instructions
+│   └── MEMORY.md                    …  Level 2: Memory module instructions
 │
 ├── dictionary/
 │   ├── _schema.yaml
@@ -267,499 +268,499 @@ Core Interaction を成立させるための3つの key function：
 └── README.md
 ```
 
-### 3.2 JSONL の冒頭スキーマ行（Muratcan 原則）
+### 3.2 Schema header line in every JSONL (Muratcan principle)
 
-すべての JSONL ファイルは冒頭行にスキーマ宣言を持つ：
+Every JSONL file carries a schema declaration on its first line:
 
 ```jsonl
-{"_schema": "activity.event", "_version": "1.0", "_description": "現場活動イベント。append-only"}
+{"_schema": "activity.event", "_version": "1.0", "_description": "Field-activity event. Append-only."}
 {"id": "evt_2026-04-26_001", "type": "session", "subject_id": "client_001", "recorded_at": "2026-04-26T10:00:00Z", "context": {"facts": {...}, "inputs": {...}, "refs": [...]}}
 {"id": "evt_2026-04-26_002", ...}
 ```
 
-### 3.3 `context` の4キー（杉本本「facts/inputs/refs/snapshot」由来）
+### 3.3 The four keys of `context` (from Sugimoto's "facts/inputs/refs/snapshot")
 
-Activity Layer イベントと Management Layer 判定の `context` フィールドは4キーに分ける。**混ぜない**。
+The `context` field of an Activity Layer event and a Management Layer decision is split into four keys. **Never mix them.**
 
-| キー | 中身 | 判定基準 |
+| Key | Content | Decision rule |
 |---|---|---|
-| `facts` | 観察・計測・システム算出 | 「こうだった」。人間の解釈は入れない |
-| `inputs` | 人間がフォーム入力した値 | 「なぜそうしたか」「何を選んだか」 |
-| `refs` | 判断根拠への参照 | 辞書層 key・ファイルパス・ルールID |
-| `snapshot` | UI状態の完全コピー | 監査・再現用。**表示には使わない** |
+| `facts` | Observations, measurements, system-computed values | "What was the case." Do not include human interpretation. |
+| `inputs` | Values entered by a human via a form | "Why this was done", "what was chosen" |
+| `refs` | References to the rationale | Dictionary keys, file paths, rule IDs |
+| `snapshot` | A complete copy of UI state | For audit and reproducibility. **Never use for display.** |
 
 ---
 
-## 4. Progressive Disclosure（Muratcan 流）
+## 4. Progressive Disclosure (Muratcan style)
 
-### 4.1 3層のロード戦略
+### 4.1 The three loading tiers
 
-| Level | 何を読むか | いつ読むか |
+| Level | What to read | When |
 |---|---|---|
-| **L1: ROUTING** | `INSTRUCTIONS/ROUTING.md` | 常時（軽量） |
-| **L2: MODULE** | `INSTRUCTIONS/{DICTIONARY,ACTIVITY,MANAGEMENT,MEMORY}.md` | タスクが該当モジュールに当たった時 |
-| **L3: DATA** | `dictionary/`, `activity/`, `management/`, `memory/` の実データ | L2 命令に従って必要分だけ |
+| **L1: ROUTING** | `INSTRUCTIONS/ROUTING.md` | Always loaded (lightweight) |
+| **L2: MODULE** | `INSTRUCTIONS/{DICTIONARY,ACTIVITY,MANAGEMENT,MEMORY}.md` | When the task hits the corresponding module |
+| **L3: DATA** | The actual data under `dictionary/`, `activity/`, `management/`, `memory/` | Only the slice required by the L2 instructions |
 
-**最大2 hops** で任意の情報に到達。
+**At most two hops** to reach any piece of information.
 
-### 4.2 ROUTING.md の例（健康指導テンプレ）
+### 4.2 Example `ROUTING.md` (health-coaching template)
 
 ```markdown
 # ROUTING
 
-## モジュール一覧
+## Module list
 
-| 発話パターン | 読むモジュール |
+| Utterance pattern | Module to read |
 |---|---|
-| 「クライアント情報を教えて」「{name}さんの状況」 | ACTIVITY → DATA: subjects/{name}.md |
-| 「次のセッションでどうする」「処方を考えて」 | MANAGEMENT + DICTIONARY + MEMORY |
-| 「過去の失敗パターン」「気をつけるべきこと」 | MEMORY → failures.jsonl |
-| 「判定基準を確認」「閾値は」 | DICTIONARY |
+| "Tell me about this client" / "How is {name} doing" | ACTIVITY → DATA: subjects/{name}.md |
+| "What should we do next session" / "Help me design a prescription" | MANAGEMENT + DICTIONARY + MEMORY |
+| "Past failure patterns" / "What to be careful about" | MEMORY → failures.jsonl |
+| "Check the criteria" / "What's the threshold" | DICTIONARY |
 ```
 
 ---
 
-## 5. 「使うほど固有化」の仕掛け
+## 5. The "specializes the more it is used" mechanism
 
-### 5.1 Management Layer 判定の動作モード
+### 5.1 Operating modes of a Management Layer decision
 
-Management Layer 判定は2モードで動く：
+A Management Layer decision runs in two modes:
 
-| モード | 入力 | 出力の特徴 |
+| Mode | Inputs | Output character |
 |---|---|---|
-| **Memory OFF** | 辞書層 + Management Layerルール + 当該Activity Layerイベント | 汎用的・規則的 |
-| **Memory ON** | 上記 + `memory/{subject_id}/*` | 過去の判断・失敗・反応パターンを引用した固有化された出力 |
+| **Memory OFF** | Dictionary Layer + Management Layer rules + the relevant Activity Layer event | Generic, rule-based |
+| **Memory ON** | The above + `memory/{subject_id}/*` | Specialized output that cites past decisions, failures, and reaction patterns |
 
-### 5.2 Phase 0 UI での体感装置
+### 5.2 The "feel-it" device on the Phase 0 UI
 
-Management Layer 判定画面に：
+On the Management Layer decision screen:
 
-1. **Memory 参照 ON/OFF トグル**
-2. **左右並べて出力差を表示**
-3. **Memory entry 数バッジ**（このsubjectは memory: 12件 など）
+1. A **Memory ON/OFF toggle** for reference.
+2. **Side-by-side display of the two outputs.**
+3. A **Memory entry-count badge** (e.g., "this subject has 12 Memory entries").
 
-これによって「使うほど質が上がる」が一目で分かる。**商談デモの最強の見せ場**。
+That makes "the more you use it, the better it gets" visible at a glance. **The single most powerful demo moment** in a sales conversation.
 
-### 5.3 Phase 1 以降：LLM 接続時の動作
+### 5.3 Phase 1 onward: behavior with an LLM connected
 
-LLM プロンプトの組み立て：
+Prompt assembly:
 
 ```
 [System]
 {ROUTING.md}
-{該当モジュールの INSTRUCTIONS/*.md}
+{the relevant INSTRUCTIONS/*.md}
 
-[Context — Memory ON 時のみ]
+[Context — only when Memory is ON]
 {memory/{subject_id}/personalization.md}
-{memory/{subject_id}/decisions.jsonl の最新 N件}
-{memory/{subject_id}/failures.jsonl の関連エントリ}
-{memory/{subject_id}/experiences.jsonl の emotional_weight ≥ 7 のもの}
+{the most recent N entries of memory/{subject_id}/decisions.jsonl}
+{the relevant entries from memory/{subject_id}/failures.jsonl}
+{the entries from memory/{subject_id}/experiences.jsonl with emotional_weight ≥ 7}
 
-[Context — 常時]
-{該当する辞書層エントリ}
-{該当 subject の最新 Activity Layer イベント}
-{該当 subject の最新 Management Layer 判定}
+[Context — always]
+{the relevant Dictionary Layer entries}
+{the most recent Activity Layer events for the subject}
+{the most recent Management Layer decisions for the subject}
 
 [User]
-{今回の判定要求}
+{the current decision request}
 ```
 
-Memory が積層するほど Context のリッチさが増し、出力品質が上がる。
+The richer Memory becomes, the richer the Context — and the better the output.
 
-### 5.4 出力レイヤーの責務分離（書き直し回避の構造原則）
+### 5.4 Output-layer responsibility separation (a structural rule that prevents rewrites)
 
-データ層（`management-judge.ts` 等の判定エンジン）と画面層（`page.tsx` / `*-result.tsx`）の間に、**audience 別の出力整形を担う中間層**を置く。
+Place a **middle layer responsible for audience-specific output formatting** between the data layer (decision engines such as `management-judge.ts`) and the view layer (`page.tsx` / `*-result.tsx`).
 
 ```
-[データ層]                    [中間層]                       [画面層]
-Memory ファイル群       →   buildJudgmentOutput({       →   JSX で表示
-ルール / 辞書層              audience, ... })
-                            → JudgmentOutputV2
-                              （audience を考慮した
-                                整形済みデータ）
+[Data layer]                  [Middle layer]                [View layer]
+Memory files          →      buildJudgmentOutput({   →     JSX rendering
+Rules / dictionary           audience, ... })
+                             → JudgmentOutputV2
+                               (data already shaped
+                                for that audience)
 ```
 
-#### 配置
+#### Placement
 
-- 中間層：`src/lib/judgment-output.ts`
-- 主要型：`JudgmentOutputV2` / `JudgmentMemorySection` / `JudgmentBullet` / `JudgmentRecommendation`
-- 主要関数：`buildJudgmentOutput(input: BuildJudgmentOutputInput): Promise<JudgmentOutputV2>`
+- Middle layer: `src/lib/judgment-output.ts`
+- Primary types: `JudgmentOutputV2` / `JudgmentMemorySection` / `JudgmentBullet` / `JudgmentRecommendation`
+- Primary function: `buildJudgmentOutput(input: BuildJudgmentOutputInput): Promise<JudgmentOutputV2>`
 
-#### 設計原則
+#### Design rules
 
-1. **画面は中間層から受け取った構造化データを表示するだけ**。生 Markdown / 生 JSON / 生 Memory 文字列を画面側で組み立てない
-2. **audience フィルタの実装は中間層に閉じる**。画面コードは audience 切替時にノータッチ
-3. **中間層は audience に応じて Memory の中身を抽出/抑制する責務を持つ**
+1. **The view simply renders the structured data it receives from the middle layer.** It does not assemble raw Markdown, raw JSON, or raw Memory strings.
+2. **The audience filter is implemented in the middle layer.** Switching audience does not touch the view code.
+3. **The middle layer is responsible for extracting or suppressing Memory content according to the audience.**
 
-#### audience の4レベル（§9.2 と整合）
+#### The four audience levels (consistent with §9.2)
 
-| audience | 対象 | Memory の出し方 |
+| audience | Target | How Memory is exposed |
 |---|---|---|
-| `self` | 担当者本人 | フル表示（personalization 全文・失敗詳細・判断理由・エピソード本文） |
-| `team` | テナント内同僚 | personalization の生活制約・家族構成等を抑制、失敗・判断・エピソードは要約 |
-| `client` | subject 本人 | 過去 Memory は出さない、汎用推奨アクションのみ |
-| `demo` | デモ・第三者 | 仮名化、具体例はサンプルに置換 |
+| `self` | The operator themselves | Full display (full personalization, failure detail, decision rationale, experience body) |
+| `team` | A colleague inside the same tenant | Suppress personal-life constraints and family details in personalization; summarize failures, decisions, and experiences |
+| `client` | The subject themselves | Past Memory is not shown; only generic recommended actions |
+| `demo` | Demos and third parties | Pseudonymize, replace concrete examples with samples |
 
-#### 実装ロードマップ
+#### Implementation roadmap
 
-- **Step 0.5（完了：2026-04-29）**：型定義 + `audience='self'` の実装。他は self にフォールバック
-- **Step 1（完了：2026-04-29）**：画面（`judge/page.tsx` + `judge-result.tsx`）を `JudgmentOutputV2` ベースに書き直し。Activity セクションも同パターンに整理可
-- **Step 2（完了：2026-04-29）**：`audience='team' / 'client' / 'demo'` の Phase 0 実装 + audience セレクター UI（URL パラメータ駆動）
+- **Step 0.5 (done: 2026-04-29)**: type definitions plus the `audience='self'` implementation. Other audiences fall back to `self`.
+- **Step 1 (done: 2026-04-29)**: rewrite the views (`judge/page.tsx` + `judge-result.tsx`) to consume `JudgmentOutputV2`. The Activity section can follow the same pattern.
+- **Step 2 (done: 2026-04-29)**: implement Phase 0 versions of `audience='team' / 'client' / 'demo'` plus the audience-selector UI (driven by URL parameter).
 
-#### Phase 0 の audience 別フィルタ実装
+#### Phase 0 audience filter implementation
 
 | audience | personalization | failures / decisions / experiences | recommendation | subject_id |
 |---|---|---|---|---|
-| `self` | 全文（raw_text） | 全件 bullet 化 | generic + cautions + leverages | 実 ID |
-| `team` | 抽象化された方針 1 行のみ（raw_text 抑制） | 全件 bullet 化 | generic + cautions + leverages | 実 ID |
-| `client` | 非表示 | 非表示 | generic のみ | 実 ID |
-| `demo` | 非表示 | 非表示 | generic のみ | `[demo-subject]` に置換 |
+| `self` | Full text (`raw_text`) | All entries as bullets | `generic` + `cautions` + `leverages` | Real ID |
+| `team` | One abstracted policy line only (raw_text suppressed) | All entries as bullets | `generic` + `cautions` + `leverages` | Real ID |
+| `client` | Hidden | Hidden | `generic` only | Real ID |
+| `demo` | Hidden | Hidden | `generic` only | Replaced with `[demo-subject]` |
 
-- `memory_counts` は全 audience で維持（R-5「データはあなたのもの」を担保するため、件数だけは透明にする）
-- Phase 1 で精緻化予定：`team` の experience を要約化、`demo` の subject 表示名や Activity も仮名化、`client` 用の subject 視点リライト
+- `memory_counts` is preserved for every audience (to honor R-5 "your data is yours" — at least the count is transparent).
+- Phase 1 plans further refinement: summarize `team` experiences, pseudonymize subject display name and Activity for `demo`, rewrite from the subject's own perspective for `client`.
 
-#### この原則を守るメリット
+#### Why this principle pays off
 
-- audience 拡張時に画面コードを書き直さない
-- LLM アダプタ層（Phase 1）の追加時も中間層で吸収できる
-- 新しい出力先（PDF / メール / クライアントポータル）追加時も中間層を再利用
+- View code does not need to be rewritten when audiences expand.
+- An LLM adapter layer (Phase 1) can be absorbed in the middle layer.
+- New output destinations (PDF, email, client portal) reuse the same middle layer.
 
 ---
 
-### 5.5 Curation 機構（Phase 2 設計対象）
+### 5.5 Curation mechanism (a Phase 2 design target)
 
-§1.7 の Network Effects を負方向に振らせないため、テンプレが第三者から流入し始める Phase 2 で導入する。
+To stop the network effects in §1.7 from going negative, curation is introduced when third-party templates start arriving in Phase 2.
 
-**4つの Curation レイヤー**（Ch.7 / Ch.8 ベース）：
+**The four curation layers** (from Ch.7 / Ch.8):
 
-| レイヤー | 役割 | context-engine での具体 |
+| Layer | Role | What it is in context-engine |
 |---|---|---|
-| Screening | 誰を Producer として入れるか決める | テンプレ作成者の認定（あはき資格・S&C資格・教育者等の専門性審査）|
-| Feedback | 望ましい行動を促す | テンプレ評価・利用ログ・成功 interaction 数 |
-| Reputation | 過去行動に基づいて審査・フィードバックを調整 | テンプレ作成者の評判スコア、失敗履歴 |
-| Human gatekeeping + User-driven | モデレーション + ユーザー評価 | founder-led initial screening + tenant rating aggregation |
+| Screening | Decide who is allowed in as a Producer | Certification of template authors (vetting acupuncture / S&C / education credentials, etc.) |
+| Feedback | Reinforce desirable behavior | Template ratings, usage logs, count of successful interactions |
+| Reputation | Tune screening and feedback by past behavior | Author reputation score, failure history |
+| Human gatekeeping + User-driven | Moderation + user review | Founder-led initial screening + tenant-rating aggregation |
 
-**運用原則**：
-- 開きすぎ = ゴミテンプレ氾濫 → テナント離脱
-- 閉じすぎ = 教育的・正当なテンプレまで排除 → 供給不足
-- **「人間の判断 + ソフトウェアの組み合わせで境界を継続監視」**（Ch.7 教訓）
+**Operating principles:**
+- Too open = a flood of garbage templates → tenant churn.
+- Too closed = legitimate, educational templates are excluded → starvation.
+- **"Combine human judgment with software to keep watching the boundary"** (lesson from Ch.7).
 
 ---
 
-## 6. 業界テンプレート
+## 6. Industry templates
 
-### 6.1 テンプレ = リポジトリのスケルトン
+### 6.1 A template = a repository skeleton
 
-業界テンプレ適用 = 上記ディレクトリ構造 + サンプル辞書・スキーマ・ルール一式を配置すること。
+Applying an industry template means placing the directory structure above with a sample dictionary, schema, and rule set.
 
-### 6.2 Phase 0 同梱：健康指導テンプレ
+### 6.2 Bundled in Phase 0: the health-coaching template
 
-`data/templates/health-coaching/` に配置：
+Located at `data/templates/health-coaching/`:
 
-- `INSTRUCTIONS/`：健康指導向けルーティング
-- `dictionary/`：リスク階層・運動分類・栄養基準などの簡易版
-- `activity/_schema.yaml`：セッション記録・問診・測定の3イベント種別
-- `management/rules/`：簡易判定ルール（例：medical_check 必須条件）
-- サンプル subject 1名分の Activity Layer + Management Layer + Memory データ
+- `INSTRUCTIONS/`: routing for health coaching
+- `dictionary/`: simplified versions of risk tiers, exercise classifications, nutrition criteria, etc.
+- `activity/_schema.yaml`: three event types — session record, intake, measurement
+- `management/rules/`: simple decision rules (for example, the conditions that require a `medical_check`)
+- Sample data for one subject, including Activity, Management, and Memory
 
-### 6.3 テンプレートの構造的責務
+### 6.3 Structural responsibilities of a template
 
-| 配置物 | 責務 |
+| Asset | Responsibility |
 |---|---|
-| `INSTRUCTIONS/*.md` | この業界での Progressive Disclosure ルーティング |
-| `dictionary/_schema.yaml` | この業界の辞書層スキーマ |
-| `dictionary/**/*` | この業界の判定基準・参照モデル |
-| `activity/_schema.yaml` | この業界のActivity Layer イベント種別とフィールド |
-| `management/_schema.yaml` | この業界のManagement Layer 判定種別とフィールド |
-| `management/rules/*.yaml` | この業界のビジネスルール |
-| 内部分類記号（C1-C5 等）| この業界テンプレ内に閉じる |
+| `INSTRUCTIONS/*.md` | Progressive Disclosure routing for this industry |
+| `dictionary/_schema.yaml` | Dictionary-Layer schema for this industry |
+| `dictionary/**/*` | Decision criteria and reference models for this industry |
+| `activity/_schema.yaml` | Activity-Layer event types and fields for this industry |
+| `management/_schema.yaml` | Management-Layer decision types and fields for this industry |
+| `management/rules/*.yaml` | Business rules for this industry |
+| Internal classification codes (`C1`–`C5`, etc.) | Confined to this industry template |
 
 ---
 
-## 7. 2モード対応（self-host / マネージドSaaS）
+## 7. Two-mode support (self-host / managed SaaS)
 
-### 7.1 self-host モード
+### 7.1 Self-host mode
 
-| 観点 | 仕様 |
+| Aspect | Spec |
 |---|---|
-| データ配置 | テナントの環境（オンプレ・各社の Vercel・各社の AWS） |
-| Auth | Supabase Auth（テナント側 Supabase に接続） |
-| 課金 | アドバイザリー契約・テンプレ更新サブスク・カスタマイズ |
-| アップデート | Git pull or 1クリックアップデート |
+| Data placement | The tenant's environment (on-prem, the tenant's Vercel, the tenant's AWS) |
+| Auth | Supabase Auth (connected to the tenant's Supabase) |
+| Billing | Advisory contracts, template-update subscriptions, customization |
+| Updates | Git pull, or one-click update |
 
-### 7.2 マネージドSaaS モード
+### 7.2 Managed SaaS mode
 
-| 観点 | 仕様 |
+| Aspect | Spec |
 |---|---|
-| データ配置 | context-engine 中央クラスタ（テナント別に隔離） |
-| Auth | 中央 Supabase Auth |
-| 課金 | 月額サブスク |
-| ターゲット | 機密度低めの個人事業（トレーナー・治療院等） |
+| Data placement | The central context-engine cluster (isolated per tenant) |
+| Auth | Central Supabase Auth |
+| Billing | Monthly subscription |
+| Target | Lower-sensitivity individual operators (trainers, clinics, etc.) |
 
-### 7.3 同じコードベースで両モード対応
+### 7.3 Both modes from the same codebase
 
-Phase 0 では実装しないが、Phase 1 設計時に：
+Not implemented in Phase 0, but Phase 1 design will:
 
-- ファイルアクセス層を `LocalFs` / `RemoteFs` の抽象に
-- Auth プロバイダを設定可能に
-- テンプレ更新は **配信API** でも **Git pull** でも対応
+- Abstract the file-access layer into `LocalFs` / `RemoteFs`
+- Make the auth provider configurable
+- Support template updates via either a **delivery API** or a **Git pull**
 
 ---
 
-## 8. 収益継続の仕組み（Phase 2 以降）
+## 8. Recurring revenue mechanism (Phase 2 onward)
 
-self-host でも継続収益を確保する仕掛け：
+How recurring revenue stays in place even in self-host:
 
-| 収益源 | 仕組み |
+| Revenue source | Mechanism |
 |---|---|
-| **アドバイザリー契約** | 月額。ユーザー（コンサル）が直接対応 |
-| **テンプレ更新サブスク** | 辞書層・Management Layerルール・スキルの定期アップデート配信。ライセンスキー検証 |
-| **新スキル配信** | Skills（Reference / Task）の追加配信 |
-| **教育プログラム** | 社内導入時の研修コンテンツ |
-| **認定プログラム** | 「context-engine 認定アドバイザー」資格 |
-| **コミュニティアクセス** | Discord/Slack |
-| **マネージドホスティング** | self-host 構築・運用代行 |
-| **カスタムテンプレ開発** | 業界別カスタマイズ |
+| **Advisory contracts** | Monthly retainer; the user (a consultant) handles delivery directly |
+| **Template-update subscription** | Periodic distribution of Dictionary-Layer, Management-Layer rule, and skill updates; license-key verification |
+| **New skill distribution** | Additional Reference / Task skills |
+| **Education program** | Onboarding training content |
+| **Certification program** | A "context-engine certified advisor" credential |
+| **Community access** | Discord / Slack |
+| **Managed hosting** | Self-host setup and operations on behalf of tenants |
+| **Custom template development** | Industry-specific customization |
 
 ---
 
-## 9. やらないこと（Phase 0-1）
+## 9. What we do NOT do (Phase 0–1)
 
-- 完璧主義
-- ブランド名・商標の決め打ち（コードネーム context-engine 固定）
-- 課金実装
-- LLM 直接呼び出し（Phase 1 でアダプタ層）
-- conditioning-app との統合（Phase 4）
-- 認証本体の細部設計（Phase 1 で Supabase Auth 標準実装のみ）
-- 内部分類記号（C1-C5 等）のメタプラットフォーム持ち込み
-- **Core Interaction の散漫化**（Phase 0-1 では A2 + A1 種まきのみ。新規 interaction の追加は §1.4 / R-11 に従って分類してから）
-- **Curation なき第三者テンプレ受け入れ**（Chatroulette 失敗例。Phase 2 で curation 機構が稼働してから）
-- **vanity metrics による意思決定**（登録者数・招待数を主要KPIにしない。BranchOut 失敗例。§14 参照）
+- Perfectionism
+- Locking in a brand or trademark (the codename `context-engine` is fixed)
+- Billing implementation
+- Direct LLM calls (an adapter layer is added in Phase 1)
+- Integration with the vertical product application (Phase 4)
+- Detailed auth design (Phase 1 will use a stock Supabase Auth implementation only)
+- Carrying internal classification codes (`C1`–`C5`, etc.) into the meta-platform
+- **Diffusing the Core Interaction** (Phase 0–1 only does A2 plus A1 seeding; new interactions must be classified per §1.4 / R-11 first)
+- **Accepting third-party templates without curation** (the Chatroulette failure pattern; wait for Phase 2 curation to stand up)
+- **Driving decisions with vanity metrics** (registration counts, invitation counts must not be primary KPIs; the BranchOut failure pattern; see §14)
 
 ---
 
-## 10. 用語集
+## 10. Glossary
 
-| 語 | 定義 |
+| Term | Definition |
 |---|---|
-| 辞書層 (Dictionary Layer) | 普遍原則・判定基準・参照モデル。年単位編集 |
-| Activity Layer | 現場活動の記録・帳簿。append-only。杉本本の System of Activity (SoA) に対応 |
-| Management Layer | 判定・計画・ルール。版管理。杉本本の System of Management (SoM) に対応 |
-| Episodic Memory | 判断・失敗・気づき・対象固有化情報。append-only |
-| 残（バッファー）| 業務機能の最小単位。発生イベントと解消イベントのペア |
-| context 4キー | facts / inputs / refs / snapshot |
-| Progressive Disclosure | ROUTING → MODULE → DATA の3層ロード戦略 |
-| Tenant（テナント）| **N社** = context-engine フレームを使う側のコンサル業者・トレーナー・治療院・S&Cチーム等。リポジトリ単位の独立した利用者 |
-| Subject（サブジェクト）| **N社のクライアント** = A社・B社・C社・選手・学習者等。Activity Layer・Management Layer・Memory が紐付く対象 |
-| Industry Template | 業界別の辞書・スキーマ・ルールのスケルトン |
-| Memory ON/OFF | Management Layer 判定時に該当 subject の Memory を参照するか否か |
-| Self-host モード | テナントの環境にデプロイして運用するモード |
-| マネージドSaaSモード | context-engine 中央クラスタで運用するモード |
-| **Core Interaction** | プラットフォーム上で起こる中核相互作用。Participants + Value Unit + Filter で構成 |
-| **Value Unit** | Producer が作成し Consumer が消費する情報・財・サービスの単位。context-engine では業界テンプレ |
-| **Filter** | Value Unit を適切な Consumer に届けるアルゴリズム的選別ツール |
-| **Pull** | Producer / Consumer をプラットフォームに引きつける機能 |
-| **Facilitate** | interaction を簡単にする（または品質のために難しくする）機能 |
-| **Match** | 適切な Producer / Consumer をマッチングする機能 |
-| **End-to-End Principle** | アプリ固有機能は core ではなく edge に置く設計原則 |
-| **Modularity** | core（low variety・stable）と edge（high variety・進化）に分け、API で接続する構造 |
-| **Network Orchestrator** | プラットフォーム型企業。Asset builder / Service provider / Technology creator より market multiplier が高い |
-| **Same-side / Cross-side network effects** | 同サイド / 反対サイドの参加者数による価値変動。各々 positive と negative がある |
-| **Curation** | 品質・安全・関連性を維持するための選別・フィードバック・評判管理 |
-| **Anti-Design Principle** | ユーザーの予期しない使い方への余白を残す設計姿勢（Twitter ハッシュタグ等）|
-| **Multihoming** | ユーザーが同種 interaction を複数プラットフォーム上で行うこと |
-| **Switching costs** | プラットフォーム移行に伴う金銭・非金銭コスト |
-| **Platform envelopment** | 隣接プラットフォームの機能・ユーザーを吸収する競争戦略 |
-| **Liquidity** | 最小限の Producer / Consumer がいて、interaction が高い成功率で成立する状態。Startup 期の最重要マイルストーン |
-| **Interaction success / failure** | 開始された interaction が価値ある成果に至ったか否か |
-| **Side switching** | Consumer が Producer に転換すること（Airbnb のホストの多くは過去のゲスト）|
-| **Smart metrics** | Actionable / Accessible / Auditable の3条件を満たす指標 |
-| **Vanity metrics** | 登録者数など、見栄えは良いが事業健全性を示さない指標 |
-| **Single-side strategy** | 単一サイドにツールとして価値を出してから後にプラットフォーム化する Launch 戦略（OpenTable / redBus 型）|
-| **Seeding strategy** | プラットフォーム自身が初期 Value Unit を作成・借用して種まきする Launch 戦略 |
-| **Micromarket strategy** | 小さく濃い市場から始めて相互作用密度を確保する Launch 戦略（Facebook の Harvard 起点等）|
+| Dictionary Layer | Universal principles, decision criteria, reference models. Edited yearly. |
+| Activity Layer | Field-activity records and ledger. Append-only. Corresponds to *System of Activity (SoA)* in Sugimoto. |
+| Management Layer | Decisions, plans, rules. Version-controlled. Corresponds to *System of Management (SoM)* in Sugimoto. |
+| Episodic Memory | Decisions, failures, insights, subject-specific information. Append-only. |
+| Buffer (残) | The smallest unit of business function; a paired occurrence event and resolution event. |
+| The four `context` keys | facts / inputs / refs / snapshot |
+| Progressive Disclosure | The three-tier load strategy ROUTING → MODULE → DATA. |
+| Tenant | **Firm N** — the consulting firm, trainer, clinic, or S&C team that uses the context-engine framework. An independent user at the repository level. |
+| Subject | **Firm N's client** — Client A, B, C, athlete, learner, etc. The entity that the Activity Layer, Management Layer, and Memory hang off. |
+| Industry Template | A skeleton of dictionary, schema, and rules for a given industry. |
+| Memory ON/OFF | Whether the Management Layer decision references that subject's Memory. |
+| Self-host mode | A mode in which the tenant deploys and operates inside their own environment. |
+| Managed SaaS mode | A mode in which a central context-engine cluster operates the deployment. |
+| **Core Interaction** | The central interaction on a platform. Composed of Participants + Value Unit + Filter. |
+| **Value Unit** | The unit of information / good / service produced and consumed. In context-engine: an industry template. |
+| **Filter** | The algorithmic selection tool that delivers a Value Unit to the right Consumer. |
+| **Pull** | The function that draws Producers and Consumers in. |
+| **Facilitate** | The function that makes interactions easy (or deliberately hard, for quality). |
+| **Match** | The function that pairs the right Producer with the right Consumer. |
+| **End-to-End Principle** | A design principle: app-specific features belong at the edge, not in the core. |
+| **Modularity** | A structure split between core (low-variety, stable) and edge (high-variety, evolving), connected by an API. |
+| **Network Orchestrator** | A platform-type firm. Higher market multiplier than asset builders, service providers, or technology creators. |
+| **Same-side / Cross-side network effects** | Value shifts driven by participant counts on the same or opposite side. Each can be positive or negative. |
+| **Curation** | The selection, feedback, and reputation management that maintain quality, safety, and relevance. |
+| **Anti-Design Principle** | A design stance that leaves room for unanticipated user behavior (e.g., Twitter hashtags). |
+| **Multihoming** | The same user pursuing the same kind of interaction across multiple platforms. |
+| **Switching costs** | The financial and non-financial cost of moving between platforms. |
+| **Platform envelopment** | A competitive strategy that absorbs the features and users of an adjacent platform. |
+| **Liquidity** | The state in which the minimum required Producers / Consumers are present and interactions complete with a high success rate. The most critical milestone of the startup phase. |
+| **Interaction success / failure** | Whether a started interaction reaches a valuable outcome. |
+| **Side switching** | A Consumer becoming a Producer (e.g., many Airbnb hosts were guests first). |
+| **Smart metrics** | Metrics that are Actionable, Accessible, and Auditable. |
+| **Vanity metrics** | Look-good metrics (registration counts, etc.) that fail to indicate business health. |
+| **Single-side strategy** | A Launch strategy that delivers value as a tool to a single side first, then turns into a platform (OpenTable / redBus pattern). |
+| **Seeding strategy** | A Launch strategy in which the platform itself produces or borrows the initial Value Units. |
+| **Micromarket strategy** | A Launch strategy that starts with a small, dense market to secure interaction density (Facebook's Harvard origin, etc.). |
 
 ---
 
-## 11. Launch 戦略（Ch.5）
+## 11. Launch strategy (Ch.5)
 
-### 11.1 Phase 0-1 採用戦略 = Single-side + Seeding + Micromarket の3点セット
+### 11.1 The Phase 0–1 strategy = Single-side + Seeding + Micromarket
 
-| 戦略 | 適用方法 | 該当事例 |
+| Strategy | How it is applied | Reference cases |
 |---|---|---|
-| **Single-side** | A2（テナント内ツール）として価値完成 → A1 へ拡張 | OpenTable はレストラン向け予約管理から、redBus はバス事業者向け在庫管理から始めた |
-| **Seeding** | the founder produces and bundles the first industry template | Huffington Post 初期ライター雇用、Quora 編集者シード、Reddit 創業者偽プロフィール投稿 |
-| **Micromarket** | start from a single small, deep domain; expand to other industries later | Facebook の Harvard 起点、Stack Overflow のプログラミング起点 |
+| **Single-side** | Complete the value of A2 (the tenant-internal tool), then expand to A1 | OpenTable started as a reservation manager for restaurants; redBus started as inventory management for bus operators |
+| **Seeding** | The founder produces and bundles the first industry template | The Huffington Post's early hired writers, Quora's seeded editors, Reddit founders' fake profiles |
+| **Micromarket** | Start from a single small, deep domain; expand to other industries later | Facebook starting at Harvard; Stack Overflow starting from programming |
 
-### 11.2 採用しない / 後送りする Launch 戦略
+### 11.2 Launch strategies we do NOT use, or postpone
 
-| 戦略 | 不採用 / 後送り理由 |
+| Strategy | Reason |
 |---|---|
-| Follow-the-rabbit | 既に Single-side で代替可能 |
-| Piggyback | no suitable host platform exists; Fortune 500 enterprise clients are customers, not piggyback targets |
-| Marquee | 重要 Producer に金銭インセンティブを与える資金がない、Phase 2 で再検討 |
-| Producer evangelism | Phase 2 でテンプレ作成者を集めるときに採用 |
-| Big-bang adoption | Phase 3 以降のローンチイベントで検討（SXSW 型の場が必要）|
+| Follow-the-rabbit | Already covered by Single-side |
+| Piggyback | No suitable host platform exists; Fortune 500 enterprise clients are customers, not piggyback targets |
+| Marquee | No funds for paying key Producers; revisit in Phase 2 |
+| Producer evangelism | Adopted in Phase 2 when gathering template authors |
+| Big-bang adoption | Considered for Phase 3+ launch events (an SXSW-like venue is required) |
 
-### 11.3 chicken-or-egg 問題への対処
+### 11.3 Solving the chicken-or-egg problem
 
-context-engine の chicken-or-egg：「テンプレ作成者がいないとテナントは来ない、テナントがいないと作成者は作らない」。
+The chicken-or-egg of context-engine: "no template authors → no tenants; no tenants → no authors."
 
-**Phase 0-1 解法**：the founder serves as **Producer and first Consumer**. The founder builds the first industry template, uses it with their own existing clients (e.g., a major sports organization), and exhibits the result as a live reference implementation.
+**Phase 0–1 solution**: the founder serves as **Producer and first Consumer**. The founder builds the first industry template, uses it with their own existing clients (e.g., a major sports organization), and exhibits the result as a live reference implementation.
 
-### 11.4 バイラル成長は当面採用しない
+### 11.4 Viral growth is not adopted for now
 
-バイラル成長の4要素（送信者 / 価値単位 / 外部ネットワーク / 受信者）は、機密性の高いコンサル業務（医療境界・個人情報）では原則的に向かない。Building in Public の限定版（症例守秘解除した形での発信）は別軸として `ai_era_business_framework.md` 参照。
+The four ingredients of viral growth (sender / value unit / external network / receiver) are fundamentally a poor fit for high-confidentiality consulting work (medical boundaries, personal data). A bounded form of "Building in Public" (broadcast with case-confidentiality removed) is treated on a separate axis; see internal `ai_era_business_framework.md`.
 
 ---
 
-## 12. Openness 設計（Ch.7）
+## 12. Openness design (Ch.7)
 
-### 12.1 Openness は3軸で判断
+### 12.1 Three axes for evaluating Openness
 
-| 軸 | Phase 0-1 | Phase 2 | Phase 3+ |
+| Axis | Phase 0–1 | Phase 2 | Phase 3+ |
 |---|---|---|---|
-| **Sponsor / Manager** | Proprietary (single-founder operation) | Proprietary 維持 | Proprietary 維持（licensing business core）|
-| **Developer** | クローズド（外部 API なし）| Guardian 型 API 階層を開放 | Approved 開発者のエコシステム |
-| **User Producer**（テンプレ作成者）| founder only | 認定アドバイザー（screening 後）| コミュニティへ漸進開放 |
+| **Sponsor / Manager** | Proprietary (single-founder operation) | Stays proprietary | Stays proprietary (the licensing-business core) |
+| **Developer** | Closed (no external API) | A Guardian-style API tier is opened | Approved-developer ecosystem |
+| **User Producer (template authors)** | Founder only | Certified advisors (after screening) | Gradual opening to the community |
 
-### 12.2 Phase 2 で開く Developer API 階層（Guardian モデル応用）
+### 12.2 The Phase 2 Developer-API tier (a Guardian-model application)
 
-| 階層 | 内容 | 課金 / 制限 |
+| Tier | Content | Pricing / restrictions |
 |---|---|---|
-| Keyless | 公開可能なテンプレスケルトン・スキーマ仕様の閲覧 | 無料 |
-| Approved | 認定アドバイザーがカスタムテンプレを開発・配布 | 収益分配 |
-| Bespoke | self-host support and custom assistance for Fortune 500 enterprise clients | 有料アドバイザリー |
+| Keyless | Read access to the publishable template skeleton and schema spec | Free |
+| Approved | Certified advisors develop and distribute custom templates | Revenue share |
+| Bespoke | Self-host support and custom assistance for Fortune 500 enterprise clients | Paid advisory |
 
-### 12.3 What to Open vs What to Own（Phase 2 以降の判断軸）
+### 12.3 What to Open vs. What to Own (decision axes for Phase 2 onward)
 
-| 外部機能の性質 | 推奨判断 | context-engine での例 |
+| Character of the external feature | Recommended decision | Example in context-engine |
 |---|---|---|
-| 主要価値源である | 所有・買収・自社実装 | the health-coaching template and integrated screening design (the core of the founder's premium template offering) |
-| 独立プラットフォーム化し得る | 所有または代替 | 認定プログラム本体・コミュニティ運営 |
-| 一時的・分散的・個別価値 | 外部所有を許容 | 個別テナントの subject 別 Memory |
-| 多数開発者が再発明している汎用機能 | API化・標準化 | テンプレ適用機構・エクスポート機構 |
+| It is a primary value source | Own / acquire / build in-house | The health-coaching template and the integrated screening design (the core of the founder's premium template offering) |
+| It could become a standalone platform | Own or substitute | The certification-program core, community operations |
+| Temporary, distributed, individual value | External ownership is acceptable | Per-subject Memory inside an individual tenant |
+| A generic feature that many developers reinvent | API-ize and standardize | The template-application mechanism, the export mechanism |
 
 ---
 
-## 13. Governance（Ch.8 / Phase 2 以降の設計対象）
+## 13. Governance (Ch.8 / a Phase 2-onward design target)
 
-### 13.1 Market Failure 4原因（context-engine 文脈）
+### 13.1 The four causes of market failure (in the context of context-engine)
 
-| 原因 | context-engine での具体問題 | 設計対応 |
+| Cause | Concrete problem in context-engine | Design response |
 |---|---|---|
-| 情報の非対称性 | テンプレ品質・Memory entry の真偽が外から分からない | テンプレ評価・利用ログ開示・実績証明 |
-| 外部性 | テンプレ作成者の利益と consumer 利益の乖離（金銭インセンティブ目的の低品質テンプレ）| 収益分配ルール・品質連動報酬 |
-| 独占力 | 特定テンプレが標準化しすぎて代替が排除される | 多様性確保ルール・複数テンプレ併存推奨 |
-| リスク | 不正テンプレで誤った臨床判断 → 安全被害 | 認定制・保険・違反時の責任配分 |
+| Information asymmetry | Outsiders cannot tell template quality or whether Memory entries are truthful | Template ratings, usage-log disclosure, evidence of results |
+| Externalities | Author interests diverge from consumer interests (low-quality templates pushed for monetary incentives) | Revenue-sharing rules, quality-linked compensation |
+| Monopoly power | A specific template standardizes too far and crowds out alternatives | Diversity rules, recommend coexistence of multiple templates |
+| Risk | Bad templates → wrong clinical decisions → safety harm | Certification, insurance, allocation of liability for violations |
 
-### 13.2 Lessig 4ツール（context-engine 適用）
+### 13.2 Lessig's four tools (applied to context-engine)
 
-| ツール | context-engine での具体化 |
+| Tool | What it becomes in context-engine |
 |---|---|
-| **Laws** | 利用規約・テンプレ作成者契約・Code of Conduct・違反時のサスペンド条項 |
-| **Norms** | テンプレ作成者コミュニティの文化・ロール進行（投稿者→検査者→組織者の経路 = iStockphoto 型）|
-| **Architecture** | Append-only 強制・edit_lock・version 管理・ファイル仕様 API |
-| **Markets** | 収益分配・社会的通貨（テンプレ評価・認定アドバイザー資格・寄付ポイント）|
+| **Laws** | Terms of service, template-author agreements, code of conduct, suspension clauses for violations |
+| **Norms** | Author-community culture, role progression (poster → reviewer → organizer; the iStockphoto pattern) |
+| **Architecture** | Append-only enforcement, `edit_lock`, version control, the file-spec API |
+| **Markets** | Revenue sharing, social currency (template ratings, certified-advisor credentials, donation points) |
 
-### 13.3 Smart Self-Governance 2原則（Ch.8）
+### 13.3 Two principles of Smart Self-Governance (Ch.8)
 
-1. **Internal transparency**：context-engine 内部チームも全機能を API として公開（Amazon Yegge Rant 型）。これは §1.6 Modularity と表裏一体
-2. **Participation**：外部パートナー（テンプレ作成者）に意思決定の声を与える。一方的なルール変更（Keurig 2.0 失敗例）を避ける
+1. **Internal transparency**: even an internal context-engine team exposes every feature as an API (the Amazon-Yegge-Rant pattern). This is two sides of the same coin as §1.6 Modularity.
+2. **Participation**: external partners (template authors) are given a voice in decision-making. Avoid unilateral rule changes (the Keurig 2.0 failure).
 
-### 13.4 Intel Architecture Labs 自己統治 10原則（参照点）
+### 13.4 The IAL (Intel Architecture Labs) Self-Governance Ten Principles (reference)
 
 The IAL 10 principles are kept in internal reference materials and will be consulted when designing Phase 2 governance. Key points:
-1. 顧客に重要意思決定への声を与える
-2. オープン標準はオープンであり続ける
-3. 知的財産を公正に扱う
-4. 明確なロードマップを伝え守る
-5. 戦略的市場参入は事前告知し差別的情報提供をしない
-6. 大型投資ではリスクを共有する
-7. プラットフォーム不変は約束しない、早期通知を約束する
-8. 差別化された便益の資格条件は明確にする
-9. パートナーの長期財務健全性を促進する
-10. 成熟に伴い意思決定をコアから周辺へ外向きに進める
+1. Give customers a voice in important decisions
+2. Open standards stay open
+3. Treat IP fairly
+4. Communicate and keep a clear roadmap
+5. Pre-announce strategic market entries; do not provide discriminatory information
+6. Share risk on large investments
+7. Promise early notice, not platform immutability
+8. Make eligibility for differentiated benefits explicit
+9. Promote partners' long-term financial health
+10. As maturity grows, push decision-making outward from the core to the edge
 
 ---
 
-## 14. Metrics（Ch.9）
+## 14. Metrics (Ch.9)
 
-### 14.1 lifecycle 別の主要指標
+### 14.1 Lifecycle-specific primary metrics
 
-| フェーズ | 主な問い | 指標の焦点 |
+| Phase | Key question | Metric focus |
 |---|---|---|
-| **Startup（Phase 0-1）** | Core Interaction は成立しているか | liquidity / matching quality / trust |
-| **Growth（Phase 2）** | 成長と収益化を壊さず拡大できるか | producer/consumer ratio / LTV / interaction conversion / side switching |
-| **Maturity（Phase 3+）** | 成熟後も価値を増やし競争に対応できるか | developer extensions / 急上昇機能 / 戦略データ |
+| **Startup (Phase 0–1)** | Is the Core Interaction working? | liquidity / matching quality / trust |
+| **Growth (Phase 2)** | Can we scale without breaking growth or monetization? | producer/consumer ratio / LTV / interaction conversion / side switching |
+| **Maturity (Phase 3+)** | Can we keep adding value and respond to competition? | developer extensions / breakout features / strategic data |
 
-### 14.2 Phase 0-1 で測る指標（具体）
+### 14.2 Phase 0–1 metrics in concrete terms
 
-| 指標 | 測り方 | 意味 |
+| Metric | How to measure | Meaning |
 |---|---|---|
-| **liquidity** | 1テンプレあたりの interaction 成功率（テナントが実際に Memory を積層・Management 判定を実行した回数）| プラットフォーム成立の最初の閾値 |
-| **matching quality** | テンプレ↔業種・症状↔知識参照のマッチ精度 | 検索 → interaction の転換率 |
-| **trust** | テナントが Memory ON で判定を実行する率（Memory OFF からの離脱率）| 「使うほど質が上がる」体感 |
+| **liquidity** | The success rate of interactions per template (the count of times a tenant actually accumulated Memory or executed a Management decision) | The first threshold for the platform to exist |
+| **matching quality** | Match accuracy between template ↔ industry, symptoms ↔ knowledge references | The conversion rate from search to interaction |
+| **trust** | The rate at which tenants execute decisions with Memory ON (the churn rate from Memory OFF) | The "it gets better with use" experience |
 
-### 14.3 Smart Metrics 3条件
+### 14.3 The three Smart-Metric conditions
 
-| 条件 | 意味 |
+| Condition | Meaning |
 |---|---|
-| **Actionable** | 次のアクションに繋がる指標である |
-| **Accessible** | データを集め使う人々が理解できる |
-| **Auditable** | 正確で意味があり、現実のユーザー体験を反映している |
+| **Actionable** | Drives the next action |
+| **Accessible** | Understandable to the people gathering and using the data |
+| **Auditable** | Accurate, meaningful, reflects the real user experience |
 
-### 14.4 Vanity metrics 禁止リスト
+### 14.4 Vanity-metric blacklist
 
-以下は主要 KPI として使わない（D-014）：
-- 登録テナント数（活動していない登録は無価値）
-- 累積テンプレ数（使われていないテンプレは無価値）
-- ダウンロード数 / アクセス数
-- SNS フォロワー / シェア数
+The following are not used as primary KPIs (D-014):
+- Registered tenant count (registrations without activity are worthless)
+- Cumulative template count (templates that nobody uses are worthless)
+- Download / page-view counts
+- Social-media followers / shares
 
-**最終指標**：「各ネットワーク側にいる happy なテナントが、価値創造的な interaction へ繰り返し、増加的に参加しているか」（Ch.9 結語）
+**The final indicator**: "Are happy tenants on each side of the network repeatedly and increasingly engaging in value-creating interactions?" (Ch.9 conclusion)
 
 ---
 
-## 15. Competitive Strategy（Ch.10）
+## 15. Competitive strategy (Ch.10)
 
-### 15.1 context-engine は「完全 winner-take-all 市場」ではない
+### 15.1 context-engine is not a "perfect winner-take-all" market
 
-Winner-take-all 4つの力での診断：
+Diagnosis with the four winner-take-all forces:
 
-| 力 | context-engine での強さ | 含意 |
+| Force | Strength in context-engine | Implication |
 |---|---|---|
-| Supply economies of scale | 中（テンプレ作成は固定費そこそこ、配布は限界費用ゼロ）| 他社追随を強くは阻めない |
-| Strong network effects | 中〜強（同業界テンプレを使うテナントが増えるほど Memory パターンの共有価値増、curation 改善）| Phase 2 で curation が機能すれば強化 |
-| Multihoming / Switching costs | 中（自テナントの Memory・Activity ログを移行できるならスイッチコスト下がる、ただし Memory が積層するほど高くなる）| データポータビリティを残しつつ Memory 蓄積で粘着性を作る |
-| Lack of niche specialization | **弱い = ニッチ特化が効く**（業界別テンプレ・規模別・専門領域別）| **複数プラットフォームが業界別に共存する**市場構造 |
+| Supply economies of scale | Medium (template authoring has decent fixed cost; distribution is near-zero marginal cost) | Cannot strongly block competitors |
+| Strong network effects | Medium-to-strong (more tenants on a single industry template → more Memory-pattern sharing → curation improves) | Strengthens once curation is functioning in Phase 2 |
+| Multihoming / Switching costs | Medium (a tenant's Memory and Activity logs can be migrated, lowering switching costs; but stickiness rises as Memory accumulates) | Keep portability while creating gravity through Memory accumulation |
+| Lack of niche specialization | **Weak — niche specialization works well** (industry-specific templates, scale-specific, specialty-specific) | **A market structure where multiple platforms coexist along industry lines** |
 
-→ **完全 winner-take-all ではない。各業界・各専門領域でリーダー争いが起きる**（D-015）。
+→ **Not a perfect winner-take-all. Leadership races happen per industry and per specialty** (D-015).
 
-### 15.2 ニッチ特化戦略
+### 15.2 Niche-specialization strategy
 
-| 取り組み | 内容 |
+| Effort | Content |
 |---|---|
-| 業界別テンプレで差別化 | 健康指導・チームスポーツ・教育・治療院・健康経営でそれぞれ最強テンプレを目指す |
-| Vimeo モデル | 高品質 Producer 向けツールを徹底（YouTube 型の汎用大衆化を追わない）|
-| Airbnb vs Craigslist 教訓 | facilitate と match の品質で勝負（unmanaged list ではなく品質キュレートされた検索体験）|
+| Differentiate via industry-specific templates | Aim for the strongest template in each of: health coaching, team sports, education, clinics, corporate health management |
+| The Vimeo model | Focus on tools for high-quality Producers (do not chase YouTube-style mass generalization) |
+| The Airbnb-vs-Craigslist lesson | Compete on the quality of Facilitate and Match (a curated search experience, not an unmanaged list) |
 
-### 15.3 6つの Platform Competition Strategies（参照表）
+### 15.3 The six Platform Competition Strategies (reference table)
 
-Phase 2 以降の戦略道具箱として保持：
+Kept as a strategy toolbox for Phase 2 onward:
 
-| 番号 | 戦略 | context-engine での適用想定時期 |
+| # | Strategy | Expected use in context-engine |
 |---|---|---|
-| 1 | Prevent multihoming | Phase 2 後半（テンプレ作成者囲い込み）|
-| 2 | Foster innovation, capture value | Phase 2-3（ロードマップ公開で外部開発者を集め、主要価値源は所有）|
-| 3 | Leverage data | Phase 2-3（戦略的データ分析）|
-| 4 | Redefine M&A | Phase 3+（隣接プラットフォーム買収判断）|
-| 5 | Platform envelopment | Phase 3+（隣接領域の包囲）|
-| 6 | Enhanced platform design | **Phase 0-1 から継続**（pull / facilitate / match の品質で勝つ）|
+| 1 | Prevent multihoming | Phase 2 late stage (lock in template authors) |
+| 2 | Foster innovation, capture value | Phase 2–3 (open the roadmap to attract external developers; own the primary value sources) |
+| 3 | Leverage data | Phase 2–3 (strategic data analysis) |
+| 4 | Redefine M&A | Phase 3+ (decisions on acquiring adjacent platforms) |
+| 5 | Platform envelopment | Phase 3+ (envelop adjacent domains) |
+| 6 | Enhanced platform design | **Continuous from Phase 0–1** (win on Pull / Facilitate / Match quality) |
 
-### 15.4 3D チェスの認識
+### 15.4 The 3D-chess view
 
-competition は3層で起きる：
-1. **Platform vs Platform**：他のメソドロジー流通プラットフォーム
-2. **Platform vs Partner**：context-engine 自身がテンプレ作成者と競合する局面（注意：自社が便利機能をコア化するとパートナー信頼を失う / Microsoft IE / Amazon 出店者問題）
-3. **Partner vs Partner**：テンプレ作成者同士の競争設計
+Competition happens on three layers:
+1. **Platform vs. Platform**: other methodology-distribution platforms.
+2. **Platform vs. Partner**: cases where context-engine itself competes with a template author (warning: turning a partner-favorite feature into a core feature kills partner trust — Microsoft IE / the Amazon-Marketplace seller problem).
+3. **Partner vs. Partner**: how competition between template authors is designed.
