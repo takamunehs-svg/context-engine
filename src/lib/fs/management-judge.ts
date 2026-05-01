@@ -182,21 +182,110 @@ function getByPath(obj: unknown, dotPath: string): unknown {
  */
 function extractRelevantMemory(
   memory: MemoryBundle,
-  _matched: ManagementRule | null,
-  _facts: Record<string, unknown>
+  matched: ManagementRule | null,
+  facts: Record<string, unknown>
 ) {
+  const factTokens = buildFactTokens(facts);
+  const matchedRuleTokens = buildRuleTokens(matched);
+
+  const rankedFailures = memory.failures
+    .map((f) => ({
+      item: f,
+      score: scoreFailure(f, factTokens, matchedRuleTokens),
+    }))
+    .sort((a, b) => b.score - a.score || b.item.recorded_at.localeCompare(a.item.recorded_at))
+    .slice(0, 3)
+    .map(({ item }) => `${item.what_went_wrong} → 予防策: ${item.prevention}`);
+
+  const rankedDecisions = memory.decisions
+    .map((d) => ({
+      item: d,
+      score: scoreDecision(d, factTokens, matchedRuleTokens),
+    }))
+    .sort((a, b) => b.score - a.score || b.item.recorded_at.localeCompare(a.item.recorded_at))
+    .slice(0, 3)
+    .map(({ item }) => `${item.title}: ${item.decision}（理由: ${item.rationale}）`);
+
+  const rankedExperiences = memory.experiences
+    .filter((e) => e.emotional_weight >= 7)
+    .map((e) => ({
+      item: e,
+      score: scoreExperience(e, factTokens, matchedRuleTokens),
+    }))
+    .sort((a, b) => b.score - a.score || b.item.recorded_at.localeCompare(a.item.recorded_at))
+    .slice(0, 5)
+    .map(({ item }) => `[${item.emotional_weight}/10] ${item.insight}`);
+
   return {
     personalization: memory.personalization || undefined,
-    failure_patterns: memory.failures
-      .slice(-3)
-      .map((f) => `${f.what_went_wrong} → 予防策: ${f.prevention}`),
-    relevant_decisions: memory.decisions
-      .slice(-3)
-      .map((d) => `${d.title}: ${d.decision}（理由: ${d.rationale}）`),
-    strong_experiences: memory.experiences
-      .filter((e) => e.emotional_weight >= 7)
-      .map((e) => `[${e.emotional_weight}/10] ${e.insight}`),
+    failure_patterns: rankedFailures,
+    relevant_decisions: rankedDecisions,
+    strong_experiences: rankedExperiences,
   };
+}
+
+function buildFactTokens(facts: Record<string, unknown>): string[] {
+  return Object.entries(facts).flatMap(([key, value]) =>
+    [key, String(value)]
+      .join(' ')
+      .toLowerCase()
+      .split(/[^a-z0-9_\u3040-\u30ff\u4e00-\u9faf]+/)
+      .filter(Boolean)
+  );
+}
+
+function buildRuleTokens(matched: ManagementRule | null): string[] {
+  if (!matched) return [];
+  const ruleText = JSON.stringify(matched.output);
+  return ruleText
+    .toLowerCase()
+    .split(/[^a-z0-9_\u3040-\u30ff\u4e00-\u9faf]+/)
+    .filter(Boolean);
+}
+
+function scoreFailure(
+  failure: MemoryBundle['failures'][number],
+  factTokens: string[],
+  ruleTokens: string[]
+): number {
+  const tagOverlap = overlapCount(failure.pattern_tags, [...factTokens, ...ruleTokens]) * 4;
+  const text = `${failure.what_went_wrong} ${failure.root_cause} ${failure.prevention}`;
+  const tokenOverlap = overlapCount(tokenize(text), factTokens) * 2;
+  return tagOverlap + tokenOverlap;
+}
+
+function scoreDecision(
+  decision: MemoryBundle['decisions'][number],
+  factTokens: string[],
+  ruleTokens: string[]
+): number {
+  const text = `${decision.title} ${decision.context} ${decision.decision} ${decision.rationale}`;
+  const factOverlap = overlapCount(tokenize(text), factTokens) * 2;
+  const ruleOverlap = overlapCount(tokenize(text), ruleTokens);
+  return factOverlap + ruleOverlap;
+}
+
+function scoreExperience(
+  experience: MemoryBundle['experiences'][number],
+  factTokens: string[],
+  ruleTokens: string[]
+): number {
+  const tagOverlap = overlapCount(experience.tags, [...factTokens, ...ruleTokens]) * 3;
+  const factOverlap = overlapCount(tokenize(experience.insight), factTokens);
+  return tagOverlap + factOverlap + experience.emotional_weight;
+}
+
+function tokenize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9_\u3040-\u30ff\u4e00-\u9faf]+/)
+    .filter(Boolean);
+}
+
+function overlapCount(a: string[], b: string[]): number {
+  if (a.length === 0 || b.length === 0) return 0;
+  const bSet = new Set(b.map((t) => t.toLowerCase()));
+  return a.reduce((count, t) => (bSet.has(t.toLowerCase()) ? count + 1 : count), 0);
 }
 
 function renderOutput(
