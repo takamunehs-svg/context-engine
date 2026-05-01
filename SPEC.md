@@ -54,9 +54,9 @@ That is the real mechanism behind "the more you use it, the better it gets." Eve
 
 | Source | Design contribution |
 |---|---|
-| Sugimoto, *Domain-Driven Data Modeling* (Japanese: 杉本『データモデリングでドメインを駆動する』) | The 3-layer responsibility split, the buffer concept, business-rule decoupling |
+| Sugimoto, *Domain-Driven Data Modeling* | The 3-layer responsibility split, the buffer concept, business-rule decoupling |
 | Muratcan, *The File System Is the New Database* | File-system first, Progressive Disclosure, Format-Function Mapping, Episodic Memory |
-| Kajiya, *How to build a business and an organization in the generative-AI era* (Japanese: 梶谷『生成AI時代を勝ち抜く事業・組織のつくり方』) | The "gets better with use" structure, MOAT, UX principles |
+| Kajiya, *How to Build a Business and Organization in the Generative AI Era* | The "gets better with use" structure, MOAT, UX principles |
 | Choudary, Parker, Van Alstyne, *Platform Revolution* | Core Interaction (Participants + Value Unit + Filter), Pull/Facilitate/Match, End-to-End Principle, Modularity, the four kinds of network effect, Curation, the eight Launch strategies, three Openness axes, four causes of market failure + Lessig's four tools, lifecycle metrics, and niche-specialization strategy |
 
 ### 1.3 The six non-negotiable principles
@@ -187,9 +187,9 @@ Three key functions make a Core Interaction stand up:
 | Examples | Session records, measurements, intake forms, coaching notes |
 | Append-only? | **Yes (non-negotiable)**. Corrections become new events |
 
-**The "buffer" concept** (from Sugimoto): the smallest unit of business function is built around a buffer — a paired "occurrence event" and "resolution event."
+**The "buffer" concept** (Reference: Sugimoto, *Domain-Driven Data Modeling*): the smallest unit of business function is built around a buffer — a paired "occurrence event" and "resolution event."
 
-> **From Sugimoto**: this layer corresponds to the *System of Activity (SoA)* in the same book; rebranded to a generic English term in D-007.
+> **Reference: Sugimoto, *Domain-Driven Data Modeling***: this layer corresponds to *System of Activity (SoA)* in the same book; rebranded to a generic English term in D-007.
 
 ### 2.3 Management Layer
 
@@ -203,9 +203,9 @@ Three key functions make a Core Interaction stand up:
 | Examples | Program design, progress assessment, intervention mix |
 | Append-only? | No (**version-controlled**: v1, v2, ... with `superseded_by`) |
 
-**Multi-dimensional, versioned, business rules** (from Sugimoto): unlike the Activity Layer, the Management Layer handles summaries, cubes, and the evolution of plans. Business rules are decoupled from the Activity Layer via dependency injection and table-driven design.
+**Multi-dimensional, versioned, business rules** (Reference: Sugimoto, *Domain-Driven Data Modeling*): unlike the Activity Layer, the Management Layer handles summaries, cubes, and the evolution of plans. Business rules are decoupled from the Activity Layer via dependency injection and table-driven design.
 
-> **From Sugimoto**: this layer corresponds to the *System of Management (SoM)* in the same book; rebranded to a generic English term in D-007.
+> **Reference: Sugimoto, *Domain-Driven Data Modeling***: this layer corresponds to *System of Management (SoM)* in the same book; rebranded to a generic English term in D-007.
 
 ### 2.4 Episodic Memory
 
@@ -544,10 +544,10 @@ How recurring revenue stays in place even in self-host:
 | Term | Definition |
 |---|---|
 | Dictionary Layer | Universal principles, decision criteria, reference models. Edited yearly. |
-| Activity Layer | Field-activity records and ledger. Append-only. Corresponds to *System of Activity (SoA)* in Sugimoto. |
-| Management Layer | Decisions, plans, rules. Version-controlled. Corresponds to *System of Management (SoM)* in Sugimoto. |
+| Activity Layer | Field-activity records and ledger. Append-only. Corresponds to *System of Activity (SoA)*. Reference: Sugimoto, *Domain-Driven Data Modeling*. |
+| Management Layer | Decisions, plans, rules. Version-controlled. Corresponds to *System of Management (SoM)*. Reference: Sugimoto, *Domain-Driven Data Modeling*. |
 | Episodic Memory | Decisions, failures, insights, subject-specific information. Append-only. |
-| Buffer (残) | The smallest unit of business function; a paired occurrence event and resolution event. |
+| Buffer | The smallest unit of business function; a paired occurrence event and resolution event. Reference: Sugimoto, *Domain-Driven Data Modeling*. |
 | The four `context` keys | facts / inputs / refs / snapshot |
 | Progressive Disclosure | The three-tier load strategy ROUTING → MODULE → DATA. |
 | Tenant | **Firm N** — the consulting firm, trainer, clinic, or S&C team that uses the context-engine framework. An independent user at the repository level. |
