@@ -81,7 +81,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
       {/* heading */}
       <header className="space-y-4">
         <p className="label-mono">MANAGEMENT JUDGE</p>
-        <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-tight max-w-3xl">
+        <h1 className="text-4xl md:text-5xl font-light tracking-normal leading-tight max-w-3xl">
           Memory <span className="text-[var(--accent-primary)]">ON / OFF</span>{" "}
           比較
         </h1>

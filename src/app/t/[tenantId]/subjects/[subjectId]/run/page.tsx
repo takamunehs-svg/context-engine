@@ -61,7 +61,7 @@ export default async function RunPage({ params, searchParams }: PageProps) {
       {/* heading */}
       <header className="space-y-3">
         <p className="label-mono">AI 相談</p>
-        <h1 className="text-3xl md:text-4xl font-light tracking-tight leading-tight">
+        <h1 className="text-3xl md:text-4xl font-light tracking-normal leading-tight">
           {profile.display_name} さんへの次の一手
         </h1>
         <p className="text-[var(--fg-muted)] max-w-2xl text-base leading-relaxed">

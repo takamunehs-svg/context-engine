@@ -40,7 +40,7 @@ export default async function SubjectPage({ params }: PageProps) {
       <header className="flex items-start justify-between flex-wrap gap-4">
         <div className="space-y-3">
           <p className="label-mono">SUBJECT</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight text-[var(--fg)]">
+          <h1 className="text-4xl md:text-5xl font-light tracking-normal text-[var(--fg)]">
             {profile.display_name}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-mono text-[var(--fg-muted)]">

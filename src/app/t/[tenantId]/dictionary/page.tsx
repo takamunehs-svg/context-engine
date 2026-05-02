@@ -29,7 +29,7 @@ export default async function DictionaryPage({ params }: PageProps) {
       <header className="flex items-start justify-between flex-wrap gap-4">
         <div className="space-y-3">
           <p className="label-mono">DICTIONARY LAYER</p>
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight text-[var(--fg)]">
+          <h1 className="text-4xl md:text-5xl font-light tracking-normal text-[var(--fg)]">
             辞書層 <span className="text-[var(--fg-muted)]">— 普遍知識</span>
           </h1>
           <p className="text-[var(--fg-muted)] max-w-2xl leading-relaxed">
