@@ -1,27 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_JP } from "next/font/google";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-});
-
-const notoSansJP = Noto_Sans_JP({
-  variable: "--font-noto-jp",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "context-engine — The context engine for human-AI collaboration",
@@ -35,10 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ja"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${notoSansJP.variable} h-full antialiased`}
-    >
+    <html lang="ja" className="dark h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Header />
         <main className="flex-1">{children}</main>
