@@ -33,8 +33,8 @@ export async function judge(input: JudgeInput): Promise<JudgeOutput> {
 
   // 3. Memory 読み込み（ON でも OFF でも件数は表示する）
   const memory = await loadMemory(tenant_id, subject_id);
-  const memoryExcerpts: ReturnType<typeof extractRelevantMemory> = use_memory
-    ? extractRelevantMemory(memory, matched, current_facts)
+  const memoryExcerpts: ReturnType<typeof extractRecentMemory> = use_memory
+    ? extractRecentMemory(memory)
     : {
         personalization: undefined,
         failure_patterns: [],
@@ -173,17 +173,16 @@ function getByPath(obj: unknown, dotPath: string): unknown {
 }
 
 /**
- * Memory から「今回の判定に関係しそうな」抜粋を取り出す。
+ * Memory から最新の personalization / failures / decisions / strong experiences を抽出する。
  * Phase 0 はシンプルに：
  *  - personalization.md は全文（短い前提）
  *  - failures は最新3件
  *  - decisions は最新3件
  *  - experiences は emotional_weight >= 7 のもの
+ * Phase 1 で current_facts に基づく context-aware な extractRelevantMemory を別関数として追加予定。
  */
-function extractRelevantMemory(
-  memory: MemoryBundle,
-  _matched: ManagementRule | null,
-  _facts: Record<string, unknown>
+function extractRecentMemory(
+  memory: MemoryBundle
 ) {
   return {
     personalization: memory.personalization || undefined,
@@ -205,7 +204,7 @@ function renderOutput(
   matched: ManagementRule | null,
   useMemory: boolean,
   memory: MemoryBundle,
-  excerpts: ReturnType<typeof extractRelevantMemory>
+  excerpts: ReturnType<typeof extractRecentMemory>
 ): string {
   const lines: string[] = [];
   lines.push(`# ${decisionTypeLabel(decisionType)} — 判定結果\n`);
@@ -313,7 +312,7 @@ function genericRecommendation(matched: ManagementRule | null): string {
 
 function personalizedRecommendation(
   matched: ManagementRule | null,
-  excerpts: ReturnType<typeof extractRelevantMemory>
+  excerpts: ReturnType<typeof extractRecentMemory>
 ): string {
   const generic = genericRecommendation(matched);
   const personalNotes: string[] = [];
