@@ -77,6 +77,22 @@ This follows the Linux × Red Hat model: open core, proprietary services.
 
 ---
 
+## Run the local demo
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Open:
+
+- Workspace: `http://localhost:3000/t/sample-tenant`
+- Prefilled Memory comparison: `http://localhost:3000/t/sample-tenant/subjects/client-a/judge?submitted=1&bp_systolic=145&bp_diastolic=92&pain_nrs=6&audience=self`
+
+The comparison route opens the Phase 0 proof point directly: the same facts rendered with Memory OFF and Memory ON.
+
+---
+
 ## Built by
 
 **Takamune Watanabe** — Licensed acupuncturist, anma-massage therapist
