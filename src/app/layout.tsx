@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { DEMO_JUDGE_HREF, DEMO_TENANT_HREF } from "@/lib/demo-links";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ function Header() {
       <div className="mx-auto max-w-7xl px-6 md:px-8 h-14 flex items-center justify-between">
         <Link
           href="/"
-          className="group flex items-center gap-2 font-mono text-sm tracking-tight text-[var(--fg)]"
+          className="group flex items-center gap-2 font-mono text-sm tracking-normal text-[var(--fg)]"
         >
           <span className="font-medium">context-engine</span>
           <span
@@ -41,13 +42,13 @@ function Header() {
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm text-[var(--fg-muted)]">
           <Link
-            href="/t/sample-tenant"
+            href={DEMO_TENANT_HREF}
             className="hover:text-[var(--fg)] transition-colors"
           >
             Demo
           </Link>
           <Link
-            href="/t/sample-tenant/dictionary"
+            href={`${DEMO_TENANT_HREF}/dictionary`}
             className="hover:text-[var(--fg)] transition-colors"
           >
             Dictionary
@@ -61,10 +62,17 @@ function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <Link
-            href="/t/sample-tenant"
+            href={DEMO_JUDGE_HREF}
             className="group inline-flex items-center gap-1.5 rounded-md border border-[var(--border-color)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] px-3 py-1.5 text-xs font-mono text-[var(--fg)] transition-colors"
           >
-            Try the demo
+            Run comparison
+            <ArrowRight className="h-3 w-3 arrow-slide" strokeWidth={1.5} />
+          </Link>
+          <Link
+            href={DEMO_TENANT_HREF}
+            className="hidden sm:inline-flex group items-center gap-1.5 rounded-md border border-transparent px-2 py-1.5 text-xs font-mono text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+          >
+            Workspace
             <ArrowUpRight className="h-3 w-3 arrow-slide" strokeWidth={1.5} />
           </Link>
         </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTenantMeta } from "@/lib/fs/tenant";
 import { loadMemory } from "@/lib/fs/subject";
 import { ArrowRight, ChevronRight, BookOpen } from "lucide-react";
+import { DEMO_JUDGE_HREF, DEMO_TENANT_ID } from "@/lib/demo-links";
 
 interface PageProps {
   params: Promise<{ tenantId: string }>;
@@ -34,7 +35,7 @@ export default async function TenantPage({ params }: PageProps) {
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="space-y-3">
             <p className="label-mono">TENANT</p>
-            <h1 className="text-4xl md:text-5xl font-light tracking-tight text-[var(--fg)]">
+            <h1 className="text-4xl md:text-5xl font-light tracking-normal text-[var(--fg)]">
               {meta.display_name}
             </h1>
             <div className="flex items-center gap-3 text-xs font-mono text-[var(--fg-muted)]">
@@ -65,12 +66,37 @@ export default async function TenantPage({ params }: PageProps) {
         </div>
       </header>
 
+      {tenantId === DEMO_TENANT_ID && (
+        <section className="rounded-lg border border-[var(--accent-border)] bg-[var(--bg-elevated)] memory-on-bg p-6 md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="label-mono text-[var(--accent-primary)] mb-2">
+                LAUNCH DEMO
+              </p>
+              <h2 className="text-2xl font-light tracking-normal text-[var(--fg)]">
+                Memory ON/OFF 比較を入力済みで開く
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
+                client-a は Memory が最も厚いサンプル。商談デモではここを最初に見せる。
+              </p>
+            </div>
+            <Link
+              href={DEMO_JUDGE_HREF}
+              className="group inline-flex w-fit items-center gap-2 rounded-md bg-[var(--accent-primary)] px-5 py-3 text-sm font-medium text-[#052e1c] shadow-[0_0_24px_rgba(16,185,129,0.25)] transition-colors hover:bg-[var(--accent-glow)]"
+            >
+              Run comparison
+              <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* subjects */}
       <section>
         <div className="mb-8 flex items-end justify-between">
           <div className="space-y-2">
             <p className="label-mono">SUBJECTS</p>
-            <h2 className="text-2xl md:text-3xl font-light tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-light tracking-normal">
               このテナントが抱えるクライアント
             </h2>
           </div>

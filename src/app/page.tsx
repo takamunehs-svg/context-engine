@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { listTenants } from "@/lib/fs/tenant";
 import { ArrowRight, ArrowUpRight, Layers, FileText, GitBranch, Brain } from "lucide-react";
+import { DEMO_JUDGE_HREF, DEMO_SUBJECT_ID, DEMO_TENANT_HREF } from "@/lib/demo-links";
 
 export default async function HomePage() {
   const tenants = await listTenants();
   return (
     <>
       <Hero />
+      <LaunchRunway />
       <FourLayers />
       <TheCore />
       <Tenants tenants={tenants} />
@@ -31,7 +33,7 @@ function Hero() {
         <div className="max-w-4xl">
           <p className="label-mono mb-8">CONTEXT ENGINE · v0.1.0</p>
 
-          <h1 className="text-5xl md:text-7xl font-light tracking-tight leading-[1.05] text-[var(--fg)]">
+          <h1 className="text-5xl md:text-7xl font-light tracking-normal leading-[1.05] text-[var(--fg)]">
             The context engine
             <br />
             for human–AI{" "}
@@ -54,20 +56,81 @@ function Hero() {
 
           <div className="mt-12 flex flex-wrap items-center gap-3">
             <Link
-              href="/t/sample-tenant"
+              href={DEMO_JUDGE_HREF}
               className="group inline-flex items-center gap-2 rounded-md bg-[var(--accent-primary)] hover:bg-[var(--accent-glow)] px-5 py-3 text-sm font-medium text-[#052e1c] transition-colors shadow-[0_0_24px_rgba(16,185,129,0.25)]"
             >
-              View live demo
+              Run Memory comparison
               <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
             </Link>
-            <a
-              href="#four-layers"
+            <Link
+              href={DEMO_TENANT_HREF}
               className="group inline-flex items-center gap-2 rounded-md border border-[var(--border-color)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] px-5 py-3 text-sm font-mono text-[var(--fg)] transition-colors"
             >
-              Read the spec
+              Open tenant workspace
               <ArrowUpRight className="h-4 w-4 arrow-slide" strokeWidth={1.5} />
-            </a>
+            </Link>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LaunchRunway() {
+  const items = [
+    {
+      label: "01",
+      title: "Memory ON/OFF",
+      copy: `${DEMO_SUBJECT_ID} の判定結果を、入力済みの状態で開く。`,
+      href: DEMO_JUDGE_HREF,
+      cta: "Run comparison",
+    },
+    {
+      label: "02",
+      title: "Tenant workspace",
+      copy: "テナント共通の辞書と subject 別 Memory の分離を見る。",
+      href: DEMO_TENANT_HREF,
+      cta: "Open workspace",
+    },
+    {
+      label: "03",
+      title: "Dictionary Layer",
+      copy: "判断基準が tenant 単位で共有される構造を確認する。",
+      href: `${DEMO_TENANT_HREF}/dictionary`,
+      cta: "View dictionary",
+    },
+  ];
+
+  return (
+    <section className="border-t border-[var(--border-color)] bg-[var(--bg-subtle)]/30">
+      <div className="mx-auto max-w-7xl px-6 md:px-8 py-12">
+        <div className="grid gap-px overflow-hidden rounded-lg border border-[var(--border-color)] bg-[var(--border-color)] md:grid-cols-3">
+          {items.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="group bg-[var(--bg)] p-6 transition-colors hover:bg-[var(--bg-elevated)]"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <span className="label-mono text-[var(--fg-subtle)]">
+                  {item.label}
+                </span>
+                <ArrowUpRight
+                  className="h-4 w-4 text-[var(--fg-muted)] group-hover:text-[var(--accent-primary)] arrow-slide"
+                  strokeWidth={1.5}
+                />
+              </div>
+              <h2 className="text-lg font-medium tracking-normal text-[var(--fg)]">
+                {item.title}
+              </h2>
+              <p className="mt-2 min-h-12 text-sm leading-relaxed text-[var(--fg-muted)]">
+                {item.copy}
+              </p>
+              <p className="mt-5 text-xs font-mono text-[var(--accent-primary)]">
+                {item.cta}
+              </p>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
@@ -126,7 +189,7 @@ function FourLayers() {
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-24 md:py-32">
         <div className="mb-16">
           <p className="label-mono mb-4">FOUR LAYERS</p>
-          <h2 className="text-3xl md:text-4xl font-light tracking-tight max-w-3xl">
+          <h2 className="text-3xl md:text-4xl font-light tracking-normal max-w-3xl">
             <span className="text-[var(--fg)]">ルールブック</span>
             <span className="text-[var(--fg-muted)]"> × </span>
             <span className="text-[var(--fg)]">履歴ログ</span>
@@ -158,7 +221,7 @@ function FourLayers() {
                     strokeWidth={1.5}
                   />
                 </div>
-                <h3 className="text-2xl font-light tracking-tight text-[var(--fg)] mb-1">
+                <h3 className="text-2xl font-light tracking-normal text-[var(--fg)] mb-1">
                   {l.en}
                 </h3>
                 <p className="text-sm text-[var(--accent-primary)] font-mono mb-6">
@@ -197,7 +260,7 @@ function TheCore() {
         <div className="grid md:grid-cols-12 gap-12 items-start">
           <div className="md:col-span-5">
             <p className="label-mono mb-4">THE CORE</p>
-            <h2 className="text-3xl md:text-4xl font-light tracking-tight leading-tight">
+            <h2 className="text-3xl md:text-4xl font-light tracking-normal leading-tight">
               Memory が積層するほど、
               <br />
               <span className="text-[var(--accent-primary)]">subject 専用に</span>
@@ -251,7 +314,7 @@ async function Tenants({
         <div className="mb-12 flex items-end justify-between">
           <div>
             <p className="label-mono mb-4">TENANTS</p>
-            <h2 className="text-3xl md:text-4xl font-light tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-light tracking-normal">
               活用中の N社
             </h2>
           </div>
@@ -272,7 +335,7 @@ async function Tenants({
                   {t.applied_template} v{t.template_version}
                 </span>
               </div>
-              <h3 className="text-2xl font-light tracking-tight text-[var(--fg)] mb-3 group-hover:text-[var(--accent-primary)] transition-colors">
+              <h3 className="text-2xl font-light tracking-normal text-[var(--fg)] mb-3 group-hover:text-[var(--accent-primary)] transition-colors">
                 {t.display_name}
               </h3>
               <p className="text-sm text-[var(--fg-muted)] leading-relaxed line-clamp-3 mb-6 whitespace-pre-line">
@@ -327,7 +390,7 @@ function Principles() {
     >
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-24 md:py-32">
         <p className="label-mono mb-4">PRINCIPLES</p>
-        <h2 className="text-3xl md:text-4xl font-light tracking-tight mb-16">
+        <h2 className="text-3xl md:text-4xl font-light tracking-normal mb-16">
           設計思想 3原則
         </h2>
         <div className="space-y-px bg-[var(--border-color)] border border-[var(--border-color)] rounded-lg overflow-hidden">
@@ -342,7 +405,7 @@ function Principles() {
                 </span>
               </div>
               <div className="md:col-span-4">
-                <h3 className="text-xl font-light tracking-tight text-[var(--fg)]">
+                <h3 className="text-xl font-light tracking-normal text-[var(--fg)]">
                   {p.title}
                 </h3>
               </div>
@@ -378,7 +441,7 @@ function Industries() {
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-24 md:py-32">
         <div className="mb-16">
           <p className="label-mono mb-4">INDUSTRIES</p>
-          <h2 className="text-3xl md:text-4xl font-light tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-light tracking-normal">
             業界横展開
           </h2>
           <p className="mt-4 text-[var(--fg-muted)] max-w-2xl">
