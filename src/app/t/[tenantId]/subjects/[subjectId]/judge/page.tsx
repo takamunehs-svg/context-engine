@@ -29,9 +29,10 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
   const submitted = "submitted" in sp;
   const facts = submitted
     ? {
-        bp_systolic: numFromSP(sp.bp_systolic),
-        bp_diastolic: numFromSP(sp.bp_diastolic),
-        pain_nrs: numFromSP(sp.pain_nrs),
+        stakeholder_alignment: numFromSP(sp.stakeholder_alignment),
+        operating_clarity: numFromSP(sp.operating_clarity),
+        field_readiness: numFromSP(sp.field_readiness),
+        rollout_risk: numFromSP(sp.rollout_risk),
       }
     : null;
 
@@ -88,7 +89,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
         <p className="text-[var(--fg-muted)] max-w-2xl leading-relaxed">
           同じ事実に対して、Memory を参照する場合としない場合で出力がどう変わるかを並列表示します。
           Memory が厚い subject ほど、ON 側で <span className="text-[var(--fg)]">{profile.display_name}</span> 固有の
-          反応パターン・過去の失敗・効いた介入が出力に反映されます。
+          反応パターン・過去の失敗・効いた進め方が出力に反映されます。
         </p>
         <div>
           <Link
@@ -199,6 +200,44 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
         </div>
       </section>
 
+      {/* long-term accumulation */}
+      <section className="rounded-lg border border-[var(--accent-border)] bg-[var(--bg-elevated)] memory-on-bg p-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div>
+            <p className="label-mono text-[var(--accent-primary)] mb-3">
+              3 YEARS LATER
+            </p>
+            <h2 className="text-2xl font-light tracking-normal text-[var(--fg)] leading-snug">
+              3年積み上がると、
+              <br />
+              「回答」ではなく「A社の判断資産」になる。
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--fg-muted)]">
+              今は6ヶ月分のデモデータです。3年運用では、四半期ごとの停滞、
+              役員会の癖、現場展開で詰まる前兆まで Memory に残ります。
+            </p>
+          </div>
+
+          <div className="space-y-px overflow-hidden rounded-md border border-[var(--accent-border)] bg-[var(--accent-border)]">
+            <AccumulationRow
+              label="6ヶ月"
+              title="個別の失敗と効いた進め方が見える"
+              detail="資料分離、責任分界、担当者の抱え込みなど、直近の判断に効くパターンが出る。"
+            />
+            <AccumulationRow
+              label="1年"
+              title="季節性と社内意思決定の癖が見える"
+              detail="予算期、繁忙期、部門長レビュー待ちなど、進めるタイミングの判断ができる。"
+            />
+            <AccumulationRow
+              label="3年"
+              title="次の詰まりを先回りできる"
+              detail="A社では誰を先に巻き込むべきか、どの資料で止まるか、どの展開単位なら承認されるかまで再利用できる。"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* facts input */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
         <p className="label-mono mb-2">INPUT — facts</p>
@@ -206,13 +245,14 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
           事実を入力
         </h2>
         <p className="text-sm text-[var(--fg-muted)] mb-8">
-          BP / NRS の値で辞書層のルールがマッチします。
+          導入・展開フェーズの事実で、辞書層のルールがマッチします。
         </p>
         <JudgeForm
           defaults={{
-            bp_systolic: numFromSP(sp.bp_systolic) ?? 135,
-            bp_diastolic: numFromSP(sp.bp_diastolic) ?? 85,
-            pain_nrs: numFromSP(sp.pain_nrs) ?? 4,
+            stakeholder_alignment: numFromSP(sp.stakeholder_alignment) ?? 3,
+            operating_clarity: numFromSP(sp.operating_clarity) ?? 2,
+            field_readiness: numFromSP(sp.field_readiness) ?? 4,
+            rollout_risk: numFromSP(sp.rollout_risk) ?? 4,
           }}
         />
       </section>
@@ -255,6 +295,30 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
           </p>
         </section>
       )}
+    </div>
+  );
+}
+
+function AccumulationRow({
+  label,
+  title,
+  detail,
+}: {
+  label: string;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <div className="grid gap-3 bg-[var(--bg-elevated)] p-4 sm:grid-cols-[72px_1fr]">
+      <div className="font-mono text-xs text-[var(--accent-primary)]">
+        {label}
+      </div>
+      <div>
+        <h3 className="text-sm font-medium text-[var(--fg)]">{title}</h3>
+        <p className="mt-1 text-xs leading-relaxed text-[var(--fg-muted)]">
+          {detail}
+        </p>
+      </div>
     </div>
   );
 }

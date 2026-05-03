@@ -1,39 +1,39 @@
 version: "0.1.0"
-description: 健康指導テンプレ Activity Layer スキーマ
+description: AI導入アドバイザリーテンプレ Activity Layer スキーマ
 event_types:
   - id: session
-    label: セッション記録
+    label: 支援セッション記録
     fields:
       facts:
         - { key: session_date, type: date, required: true }
         - { key: duration_min, type: integer, required: true }
-        - { key: pain_nrs_pre, type: integer, range: [0, 10] }
-        - { key: pain_nrs_post, type: integer, range: [0, 10] }
-        - { key: rpe, type: integer, range: [6, 20] }
+        - { key: stakeholder_alignment, type: integer, range: [1, 5] }
+        - { key: operating_clarity, type: integer, range: [1, 5] }
+        - { key: field_readiness, type: integer, range: [1, 5] }
+        - { key: rollout_risk, type: integer, range: [1, 5] }
       inputs:
         - { key: session_notes, type: text }
-        - { key: client_subjective, type: text, label: クライアント主観コメント }
+        - { key: client_signal, type: text, label: クライアントの反応・社内シグナル }
       refs:
-        - { key: program_id, type: string }
+        - { key: plan_id, type: string }
   - id: measurement
-    label: 測定
+    label: 進捗チェック
     fields:
       facts:
         - { key: measured_date, type: date, required: true }
-        - { key: bp_systolic, type: integer }
-        - { key: bp_diastolic, type: integer }
-        - { key: weight_kg, type: number }
-        - { key: rom_data, type: object, description: 関節別可動域 }
+        - { key: milestone_progress_pct, type: integer, range: [0, 100] }
+        - { key: decision_latency_days, type: integer }
+        - { key: adoption_readiness, type: integer, range: [1, 5] }
       inputs:
         - { key: notes, type: text }
   - id: intake
-    label: 問診
+    label: 初回ヒアリング
     fields:
       facts:
-        - { key: medical_history, type: array }
-        - { key: current_medications, type: array }
-        - { key: chief_complaint, type: text }
+        - { key: business_goal, type: text }
+        - { key: stakeholders, type: array }
+        - { key: current_workflow, type: text }
       inputs:
         - { key: goals, type: text }
-        - { key: lifestyle_constraints, type: text }
+        - { key: constraints, type: text }
 append_only: true

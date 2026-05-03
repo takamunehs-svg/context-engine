@@ -1,2 +1,2 @@
 {"_schema": "memory.decision", "_version": "1.0", "_description": "Client B decisions log. Append-only."}
-{"id": "dec-2026-04-001", "recorded_at": "2026-04-10T14:30:00+09:00", "title": "初期プログラム方向性", "context": "運動初心者・体重減量希望・出張多い", "alternatives_considered": ["有酸素中心", "筋トレ中心", "ハイブリッド"], "decision": "ハイブリッド（基本動作習得 + 軽有酸素）", "rationale": "出張中もできる種目を残しつつ、フォーム習得を優先"}
+{"id": "dec-2026-04-001", "recorded_at": "2026-04-10T14:30:00+09:00", "title": "初回PoCテーマの絞り方", "context": "候補テーマが多く、代表の期待値が高い", "alternatives_considered": ["代表の関心テーマから始める", "現場ヒアリング後に決める", "資料作成から始める"], "decision": "現場ヒアリングを1回挟み、最初のPoCを1業務に絞る", "rationale": "Memory が薄く、まだ反応パターンが見えていない。初回は汎用的に業務棚卸しから入る"}

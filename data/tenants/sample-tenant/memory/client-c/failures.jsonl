@@ -1,2 +1,2 @@
 {"_schema": "memory.failure", "_version": "1.0", "_description": "Client C failures log. Append-only."}
-{"id": "fail-2026-01-001", "recorded_at": "2026-01-22T11:30:00+09:00", "what_went_wrong": "宿題で意欲的に階段昇降を増やしたら、3日後に膝痛増悪", "root_cause": "課題量を本人判断に委ねすぎた。退職後で時間があるため過剰実施しがち", "prevention": "宿題は明確に上限提示（『これ以上はしない』を強調）", "pattern_tags": ["宿題", "上限提示", "過剰実施"]}
+{"id": "fail-2026-03-001", "recorded_at": "2026-03-18T11:30:00+09:00", "what_went_wrong": "商談準備テンプレを全営業へ一斉共有したら、使い方のばらつきが大きくなった", "root_cause": "トップ営業の使い方を標準手順に落とす前に広げた", "prevention": "横展開前に成功例を1つ選び、手順とレビュー観点を固定する", "pattern_tags": ["横展開", "標準化", "営業現場"]}

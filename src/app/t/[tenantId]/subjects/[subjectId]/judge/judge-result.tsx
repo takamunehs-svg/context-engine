@@ -114,7 +114,7 @@ export function JudgeResult({
             <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
               Memory を参照していないため、出力は <strong>辞書層 + ルール + 当該事実</strong> のみから生成された汎用的な内容です。
               <br />
-              この subject の過去の判断・失敗・効いた介入・反応パターンは反映されていません。
+              この subject の過去の判断・失敗・効いた進め方・反応パターンは反映されていません。
             </p>
           </Section>
         )}
@@ -353,5 +353,11 @@ function RecommendationView({
 // ─────────────────────────────────────────────
 
 function humanKey(key: string): string {
-  return key.replace(/_/g, " ").replace(/\./g, " › ");
+  const labels: Record<string, string> = {
+    stakeholder_alignment: "意思決定者の納得度",
+    operating_clarity: "運用設計の明確さ",
+    field_readiness: "現場の準備度",
+    rollout_risk: "展開リスク",
+  };
+  return labels[key] ?? key.replace(/_/g, " ").replace(/\./g, " › ");
 }

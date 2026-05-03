@@ -55,7 +55,7 @@ medical professionals, lawyers, and consultants have always done.
 
 **Open (this repository):**
 - Core architecture and file format specification
-- Sample industry template (health coaching, simplified)
+- Sample industry template (business advisory / AI adoption, simplified)
 - Web UI for exploration and demo
 
 **Closed (proprietary):**
@@ -70,7 +70,7 @@ This follows the Linux × Red Hat model: open core, proprietary services.
 
 ## Status
 
-- [x] **Phase 0**: File-system architecture, web UI, health-coaching sample template, Memory ON/OFF differentiation
+- [x] **Phase 0**: File-system architecture, web UI, business-advisory sample template, Memory ON/OFF differentiation
 - [ ] **Phase 1**: Multi-tenant, Supabase Auth, LLM adapter, second template (team sports)
 - [ ] **Phase 2**: Template marketplace, certified advisors, governance layer
 - [ ] **Phase 3+**: Open ecosystem, peer methodology sharing
@@ -87,7 +87,7 @@ pnpm dev
 Open:
 
 - Workspace: `http://localhost:3000/t/sample-tenant`
-- Prefilled Memory comparison: `http://localhost:3000/t/sample-tenant/subjects/client-a/judge?submitted=1&bp_systolic=145&bp_diastolic=92&pain_nrs=6&audience=self`
+- Prefilled Memory comparison: `http://localhost:3000/t/sample-tenant/subjects/client-a/judge?submitted=1&stakeholder_alignment=3&operating_clarity=2&field_readiness=4&rollout_risk=4&audience=self`
 
 The comparison route opens the Phase 0 proof point directly: the same facts rendered with Memory OFF and Memory ON.
 

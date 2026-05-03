@@ -1,33 +1,28 @@
-key: intervention_thresholds
-description: 介入判定の閾値
+key: advisory_thresholds
+description: AI導入支援の次アクション判定閾値
 thresholds:
-  - id: bp_systolic_high
-    field: bp_systolic
-    op: ">="
-    value: 160
-    action: medical_referral
-    rationale: 重度高血圧域。運動負荷リスクが高い
-  - id: bp_systolic_moderate
-    field: bp_systolic
-    op: ">="
-    value: 140
-    action: caution_required
-    rationale: 高血圧域。負荷漸増が望ましい
-  - id: pain_nrs_high
-    field: pain_nrs
-    op: ">="
-    value: 7
-    action: medical_referral
-    rationale: 強い疼痛。医療評価が先
-  - id: pain_nrs_moderate
-    field: pain_nrs
+  - id: rollout_risk_high
+    field: rollout_risk
     op: ">="
     value: 4
-    action: pain_management_priority
-    rationale: 中等度疼痛。介入は疼痛管理優先
-  - id: rpe_overload
-    field: rpe
-    op: ">="
-    value: 17
-    action: load_reduction
-    rationale: 主観的負荷が過剰
+    action: governance_first_plan
+    rationale: 展開リスクが高い場合は、導入範囲を広げる前に責任分界を固定する
+  - id: operating_clarity_low
+    field: operating_clarity
+    op: "<="
+    value: 2
+    action: governance_first_plan
+    rationale: 運用設計が曖昧なまま進めると、現場負荷が増えて定着しない
+  - id: stakeholder_alignment_low
+    field: stakeholder_alignment
+    op: "<="
+    value: 2
+    action: executive_alignment_plan
+    rationale: 意思決定者の納得度が低い場合は、現場施策より先に社内合意を整える
+  - id: rollout_ready
+    fields:
+      field_readiness: 4
+      operating_clarity: 3
+      rollout_risk_max: 3
+    action: rollout_enablement_plan
+    rationale: 準備がそろっている場合は、小さな展開単位で成功例を作る

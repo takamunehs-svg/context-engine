@@ -1,21 +1,21 @@
 tenant_id: sample-tenant
-display_name: サンプルN社（健康指導コンサル）
-applied_template: health-coaching
+display_name: サンプルN社（AI導入アドバイザリー）
+applied_template: business-advisory
 template_version: "0.1.0"
 created_at: "2026-04-26"
 description: |
   Phase 0 デモ用のサンプルテナント。
-  1人のトレーナー/コンサルタント（N社）が、3社のクライアント
+  1人のAIネイティブ事業構築アドバイザー（N社）が、3社の継続支援クライアント
   （client-a, client-b, client-c）を抱えている想定。
   Memory の厚さが client 間で意図的に差をつけてあり、
   「使うほど subject 固有化していく」を体感できる構成。
 subjects:
   - id: client-a
-    label: A社（厚いMemory・1年運用）
+    label: A社（厚いMemory・6ヶ月伴走）
     memory_depth: thick
   - id: client-b
-    label: B社（薄いMemory・新規1ヶ月）
+    label: B社（薄いMemory・初回商談後）
     memory_depth: thin
   - id: client-c
-    label: C社（中Memory・半年運用）
+    label: C社（中Memory・3ヶ月伴走）
     memory_depth: medium

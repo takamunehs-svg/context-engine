@@ -67,7 +67,7 @@ export function RunResult({
               strokeWidth={1.5}
             />
             <h2 className="text-base font-medium text-[var(--fg)]">
-              {subjectName} さんに気をつけること
+              {subjectName} で気をつけること
               <span className="text-xs font-mono text-[var(--fg-subtle)] ml-2">
                 過去の失敗から
               </span>
@@ -99,7 +99,7 @@ export function RunResult({
               strokeWidth={1.5}
             />
             <h2 className="text-base font-medium text-[var(--fg)]">
-              {subjectName} さんに効くこと
+              {subjectName} に効くこと
               <span className="text-xs font-mono text-[var(--fg-subtle)] ml-2">
                 過去の成功から
               </span>
@@ -121,8 +121,8 @@ export function RunResult({
         recommendation.leverages.length === 0 && (
           <p className="text-xs text-[var(--fg-subtle)] italic">
             {subjectName}{" "}
-            さんへの注意点・効くことはまだ蓄積されていません。セッション後に「気づいたこと」を残していくと、次回から
-            {subjectName} さん専用のアドバイスが出るようになります。
+            への注意点・効くことはまだ蓄積されていません。支援後に「気づいたこと」を残していくと、次回から
+            {subjectName} 専用のアドバイスが出るようになります。
           </p>
         )}
 
@@ -164,7 +164,7 @@ export function RunResult({
                 .filter(([, v]) => v !== undefined && v !== null && v !== "")
                 .map(([k, v]) => (
                   <li key={k}>
-                    <span className="text-[var(--fg-subtle)]">{k}</span>
+                    <span className="text-[var(--fg-subtle)]">{humanKey(k)}</span>
                     <span className="mx-1 text-[var(--fg-subtle)]">:</span>
                     <span className="text-[var(--fg)]">{String(v)}</span>
                   </li>
@@ -256,4 +256,14 @@ export function RunResult({
       </details>
     </section>
   );
+}
+
+function humanKey(key: string): string {
+  const labels: Record<string, string> = {
+    stakeholder_alignment: "意思決定者の納得度",
+    operating_clarity: "運用設計の明確さ",
+    field_readiness: "現場の準備度",
+    rollout_risk: "展開リスク",
+  };
+  return labels[key] ?? key.replace(/_/g, " ");
 }

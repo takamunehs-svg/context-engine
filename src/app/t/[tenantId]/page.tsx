@@ -77,7 +77,7 @@ export default async function TenantPage({ params }: PageProps) {
                 Memory ON/OFF 比較を入力済みで開く
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-                client-a は Memory が最も厚いサンプル。商談デモではここを最初に見せる。
+                client-a は6ヶ月伴走で Memory が最も厚いサンプル。商談デモではここを最初に見せる。
               </p>
             </div>
             <Link

@@ -5,31 +5,48 @@ import { ArrowRight } from "lucide-react";
 export function JudgeForm({
   defaults,
 }: {
-  defaults: { bp_systolic: number; bp_diastolic: number; pain_nrs: number };
+  defaults: {
+    stakeholder_alignment: number;
+    operating_clarity: number;
+    field_readiness: number;
+    rollout_risk: number;
+  };
 }) {
   return (
     <form action="" method="get" className="space-y-6">
       <input type="hidden" name="submitted" value="1" />
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-4 gap-4">
         <FactInput
-          name="bp_systolic"
-          label="BP 収縮期"
-          unit="mmHg"
-          defaultValue={defaults.bp_systolic}
+          name="stakeholder_alignment"
+          label="意思決定者の納得度"
+          unit="1-5"
+          defaultValue={defaults.stakeholder_alignment}
+          min={1}
+          max={5}
         />
         <FactInput
-          name="bp_diastolic"
-          label="BP 拡張期"
-          unit="mmHg"
-          defaultValue={defaults.bp_diastolic}
+          name="operating_clarity"
+          label="運用設計の明確さ"
+          unit="1-5"
+          defaultValue={defaults.operating_clarity}
+          min={1}
+          max={5}
         />
         <FactInput
-          name="pain_nrs"
-          label="疼痛 NRS"
-          unit="0-10"
-          defaultValue={defaults.pain_nrs}
-          min={0}
-          max={10}
+          name="field_readiness"
+          label="現場の準備度"
+          unit="1-5"
+          defaultValue={defaults.field_readiness}
+          min={1}
+          max={5}
+        />
+        <FactInput
+          name="rollout_risk"
+          label="展開リスク"
+          unit="1-5"
+          defaultValue={defaults.rollout_risk}
+          min={1}
+          max={5}
         />
       </div>
       <button

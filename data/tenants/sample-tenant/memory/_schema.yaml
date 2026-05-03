@@ -1,5 +1,5 @@
 version: "0.1.0"
-description: 健康指導テンプレ Memory スキーマ
+description: AI導入アドバイザリーテンプレ Memory スキーマ
 location: memory/{subject_id}/
 files:
   - id: decisions
@@ -42,5 +42,5 @@ files:
   - id: personalization
     filename: personalization.md
     format: markdown
-    description: subject 固有の反応パターン・効いた介入・コミュ特性。手書きで継続更新
+    description: subject 固有の反応パターン・効いた進め方・コミュニケーション特性。手書きで継続更新
     append_only: false

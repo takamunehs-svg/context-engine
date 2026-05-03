@@ -278,7 +278,7 @@ function TheCore() {
               へ徐々に変わる。
             </p>
             <p>
-              トレーナー N社が抱える A社・B社・C社は、辞書層も活動層スキーマも管理層ルールも
+              アドバイザー N社が抱える A社・B社・C社は、辞書層も活動層スキーマも管理層ルールも
               同じものを使う。違うのは Memory の厚さと内容だけ。だから
               <span className="text-[var(--fg)]">フレームは1つのまま</span>、
               出力だけが対象に合わせて深まっていく。
@@ -427,12 +427,11 @@ function Principles() {
 // ─────────────────────────────────────────────────────────
 
 const industries = [
-  { en: "Health Coaching", jp: "健康指導", state: "Phase 0 同梱", active: true },
+  { en: "Business Advisory", jp: "AI導入支援", state: "Phase 0 同梱", active: true },
   { en: "Team Sports", jp: "チームスポーツ", state: "Phase 1-2", active: false },
   { en: "Education", jp: "教育", state: "Phase 1-2", active: false },
+  { en: "Health Coaching", jp: "健康指導", state: "Phase 1-2", active: false },
   { en: "Clinic", jp: "治療院", state: "Phase 2", active: false },
-  { en: "Corporate Wellness", jp: "健康経営", state: "Phase 2", active: false },
-  { en: "Custom", jp: "任意（テナント自作）", state: "Phase 2", active: false },
 ];
 
 function Industries() {

@@ -19,7 +19,7 @@ export function AddMeasurementEventForm({
     <form action={action} className="space-y-3 text-sm">
       <div className="grid md:grid-cols-4 gap-3">
         <div>
-          <Label htmlFor="measured_date">測定日</Label>
+          <Label htmlFor="measured_date">チェック日</Label>
           <Input
             id="measured_date"
             name="measured_date"
@@ -29,23 +29,23 @@ export function AddMeasurementEventForm({
           />
         </div>
         <div>
-          <Label htmlFor="bp_systolic">BP 収縮期</Label>
-          <Input id="bp_systolic" name="bp_systolic" type="number" />
+          <Label htmlFor="milestone_progress_pct">マイルストーン進捗 (%)</Label>
+          <Input id="milestone_progress_pct" name="milestone_progress_pct" type="number" min={0} max={100} />
         </div>
         <div>
-          <Label htmlFor="bp_diastolic">BP 拡張期</Label>
-          <Input id="bp_diastolic" name="bp_diastolic" type="number" />
+          <Label htmlFor="decision_latency_days">意思決定の停滞日数</Label>
+          <Input id="decision_latency_days" name="decision_latency_days" type="number" min={0} />
         </div>
         <div>
-          <Label htmlFor="weight_kg">体重 (kg)</Label>
-          <Input id="weight_kg" name="weight_kg" type="number" step={0.1} />
+          <Label htmlFor="adoption_readiness">定着準備度</Label>
+          <Input id="adoption_readiness" name="adoption_readiness" type="number" min={1} max={5} />
         </div>
       </div>
       <div>
         <Label htmlFor="notes">ノート</Label>
         <Textarea id="notes" name="notes" rows={2} />
       </div>
-      <Button type="submit">測定イベントを append</Button>
+      <Button type="submit">進捗チェックを append</Button>
     </form>
   );
 }

@@ -41,13 +41,14 @@ export async function addSessionEventAction(
       facts: {
         session_date: String(formData.get('session_date') ?? ''),
         duration_min: Number(formData.get('duration_min') ?? 0),
-        pain_nrs_pre: numOrNull(formData.get('pain_nrs_pre')),
-        pain_nrs_post: numOrNull(formData.get('pain_nrs_post')),
-        rpe: numOrNull(formData.get('rpe')),
+        stakeholder_alignment: numOrNull(formData.get('stakeholder_alignment')),
+        operating_clarity: numOrNull(formData.get('operating_clarity')),
+        field_readiness: numOrNull(formData.get('field_readiness')),
+        rollout_risk: numOrNull(formData.get('rollout_risk')),
       },
       inputs: {
         session_notes: String(formData.get('session_notes') ?? ''),
-        client_subjective: String(formData.get('client_subjective') ?? ''),
+        client_signal: String(formData.get('client_signal') ?? ''),
       },
       refs: [],
     },
@@ -69,9 +70,9 @@ export async function addMeasurementEventAction(
     context: {
       facts: {
         measured_date: String(formData.get('measured_date') ?? ''),
-        bp_systolic: numOrNull(formData.get('bp_systolic')),
-        bp_diastolic: numOrNull(formData.get('bp_diastolic')),
-        weight_kg: numOrNull(formData.get('weight_kg')),
+        milestone_progress_pct: numOrNull(formData.get('milestone_progress_pct')),
+        decision_latency_days: numOrNull(formData.get('decision_latency_days')),
+        adoption_readiness: numOrNull(formData.get('adoption_readiness')),
       },
       inputs: {
         notes: String(formData.get('notes') ?? ''),

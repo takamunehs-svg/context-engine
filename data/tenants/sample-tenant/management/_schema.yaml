@@ -1,20 +1,20 @@
 version: "0.1.0"
-description: 健康指導テンプレ Management Layer スキーマ
+description: AI導入アドバイザリーテンプレ Management Layer スキーマ
 decision_types:
   - id: intervention_plan
-    label: 介入計画
+    label: 次アクション設計
     inputs_required:
       - dictionary: classifications/risk-levels
       - dictionary: thresholds/intervention-thresholds
       - dictionary: references/program-design
-      - activity: latest measurement of subject
-      - activity: latest 3 sessions of subject
+      - activity: latest progress check of subject
+      - activity: latest 3 advisory sessions of subject
       - memory: subject (when ON)
     output_fields:
       - { key: risk_level, type: string }
-      - { key: intervention_mix, type: array }
-      - { key: cycle_weeks, type: integer }
-      - { key: precautions, type: array }
+      - { key: action, type: string }
+      - { key: next_actions, type: array }
+      - { key: cautions, type: array }
       - { key: rationale, type: text }
       - { key: memory_referenced, type: boolean }
   - id: weekly_review
@@ -28,7 +28,7 @@ decision_types:
       - { key: rationale, type: text }
       - { key: next_actions, type: array }
   - id: medical_referral
-    label: 医療連携判定
+    label: エスカレーション判定
     inputs_required:
       - dictionary: thresholds/intervention-thresholds
       - activity: 当該イベント

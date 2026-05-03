@@ -3,7 +3,7 @@ level: 1
 description: Progressive Disclosure Level 1 — 常時ロード。「どのモジュールを読むか」だけを定義
 ---
 
-# ROUTING — 健康指導テンプレ
+# ROUTING — AI導入アドバイザリーテンプレ
 
 AIエージェントは、最初にこのファイルだけを読み、発話パターンに応じて次にどのモジュールを開くかを決定する。**最大2 hops** で目的のデータに到達できる構造を維持すること。
 
@@ -11,12 +11,12 @@ AIエージェントは、最初にこのファイルだけを読み、発話パ
 
 | 発話パターン | 次に読むモジュール |
 |---|---|
-| 「{subject}さんの状況」「クライアント情報」 | `INSTRUCTIONS/ACTIVITY.md` → `activity/subjects/{subject_id}.md` |
-| 「次のセッション」「処方を考えて」「介入を設計」 | `INSTRUCTIONS/MANAGEMENT.md` + `INSTRUCTIONS/DICTIONARY.md` + `INSTRUCTIONS/MEMORY.md` |
-| 「過去の失敗」「気をつけるべきこと」「効いた介入」 | `INSTRUCTIONS/MEMORY.md` → `memory/{subject_id}/` |
+| 「{subject}の状況」「クライアント情報」 | `INSTRUCTIONS/ACTIVITY.md` → `activity/subjects/{subject_id}.md` |
+| 「次の支援」「次アクションを考えて」「展開方針を設計」 | `INSTRUCTIONS/MANAGEMENT.md` + `INSTRUCTIONS/DICTIONARY.md` + `INSTRUCTIONS/MEMORY.md` |
+| 「過去の失敗」「気をつけるべきこと」「効いた進め方」 | `INSTRUCTIONS/MEMORY.md` → `memory/{subject_id}/` |
 | 「判定基準」「閾値」「リスク分類」 | `INSTRUCTIONS/DICTIONARY.md` → `dictionary/` |
-| 「セッション記録を残す」「測定値を入れる」 | `INSTRUCTIONS/ACTIVITY.md` → `activity/events/` |
-| 「判定の経過」「過去の処方」 | `INSTRUCTIONS/MANAGEMENT.md` → `management/decisions/{subject_id}/` |
+| 「支援記録を残す」「進捗チェックを入れる」 | `INSTRUCTIONS/ACTIVITY.md` → `activity/events/` |
+| 「判定の経過」「過去の支援方針」 | `INSTRUCTIONS/MANAGEMENT.md` → `management/decisions/{subject_id}/` |
 
 ## 4層モデル
 

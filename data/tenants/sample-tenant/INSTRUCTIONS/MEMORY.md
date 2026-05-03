@@ -17,7 +17,7 @@ subject別に積層する**最も対象固有化する層**。**append-only**。
 | `decisions.jsonl` | JSONL | 判断・理由・代替案・結果 |
 | `failures.jsonl` | JSONL | 失敗・根本原因・予防策 |
 | `experiences.jsonl` | JSONL | 気づき（emotional_weight 1-10） |
-| `personalization.md` | MD | この subject 固有の反応パターン・効いた介入・コミュ特性 |
+| `personalization.md` | MD | この subject 固有の反応パターン・効いた進め方・コミュ特性 |
 
 ## append-only の運用
 

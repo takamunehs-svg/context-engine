@@ -236,7 +236,7 @@ function renderOutput(
       '> Memory を参照していないため、出力は **辞書層 + ルール + 当該事実** のみから生成された汎用的な内容です。'
     );
     lines.push(
-      '> この subject の過去の判断・失敗・効いた介入・反応パターンは反映されていません。'
+      '> この subject の過去の判断・失敗・効いた進め方・反応パターンは反映されていません。'
     );
     lines.push('');
     lines.push(`## 4. 推奨アクション（汎用）\n`);
@@ -290,21 +290,25 @@ function genericRecommendation(matched: ManagementRule | null): string {
   if (!matched) return '- ルール未マッチ。辞書層と判定ルールの確認が必要';
   const action = String(matched.output.action ?? '');
   const map: Record<string, string[]> = {
-    medical_referral: [
-      '- 医療機関への紹介・連携を最優先',
-      '- 紹介状を準備し、来談者に説明',
-      '- 運動指導は医療側の評価後に再開判断',
+    governance_first_plan: [
+      '- 責任分界と運用ルールを1枚に整理',
+      '- 90日ロードマップを「誰が・いつ・何を決めるか」で引き直す',
+      '- 現場向け資料と役員向け資料を分けて作る',
     ],
-    conditional_program_with_medical_consult: [
-      '- 主治医との情報共有のもと、低〜中強度から開始',
-      '- バイタル・症状を毎セッション記録',
-      '- 増悪時は即時中止 → 再評価',
+    executive_alignment_plan: [
+      '- 役員向けの意思決定資料を先に作る',
+      '- 費用対効果・リスク・現場負荷を1枚に圧縮',
+      '- 担当者が社内説明に使える台本を渡す',
     ],
-    monitored_program: [
-      '- 通常プログラム＋モニタリング強化',
-      '- 週次で簡易レビュー',
+    rollout_enablement_plan: [
+      '- 現場チャンピオンを1名決める',
+      '- 展開単位を小さく切って最初の成功例を作る',
+      '- 週次レビューの判断指標を固定する',
     ],
-    standard_program: ['- 標準プログラムで開始', '- 月次で進捗レビュー'],
+    standard_followup_plan: [
+      '- 論点を3つに整理して次回アジェンダ化',
+      '- 次回までの宿題を1つに絞る',
+    ],
   };
   const lines = map[action] ?? ['- ルール出力に従って次アクションを設計'];
   return lines.join('\n');
@@ -342,11 +346,11 @@ function personalizedRecommendation(
 function decisionTypeLabel(t: string): string {
   switch (t) {
     case 'intervention_plan':
-      return '介入計画';
+      return '次アクション設計';
     case 'weekly_review':
       return '週次レビュー';
     case 'medical_referral':
-      return '医療連携判定';
+      return 'エスカレーション判定';
     default:
       return t;
   }

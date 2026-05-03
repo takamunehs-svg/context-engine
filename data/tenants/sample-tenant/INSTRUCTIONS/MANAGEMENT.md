@@ -21,9 +21,9 @@ description: Management Layer モジュール — 判定・計画・ルールの
 
 ## 判定種別（このテンプレで定義）
 
-- `intervention_plan`: 介入計画（処方）
+- `intervention_plan`: 次アクション設計
 - `weekly_review`: 週次レビュー（GO/ADJUST/STOP）
-- `medical_referral`: 医療連携判定
+- `medical_referral`: エスカレーション判定
 
 ## Management 判定の動作モード（核心）
 
@@ -39,15 +39,15 @@ description: Management Layer モジュール — 判定・計画・ルールの
 `management/rules/*.yaml` はテーブル駆動方式。例：
 
 ```yaml
-rule_id: medical_referral_check
-description: 医療連携が必要な状態を検出
+rule_id: governance_gap_high
+description: 展開前にガバナンス整理が必要な状態を検出
 conditions:
-  - field: facts.bp_systolic
+  - field: rollout_risk
     op: ">="
-    value: 160
-    action: medical_referral
-  - field: facts.pain_nrs
-    op: ">="
-    value: 7
-    action: medical_referral
+    value: 4
+    action: governance_first_plan
+  - field: operating_clarity
+    op: "<="
+    value: 2
+    action: governance_first_plan
 ```

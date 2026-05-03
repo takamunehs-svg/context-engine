@@ -23,9 +23,10 @@ export default async function RunPage({ params, searchParams }: PageProps) {
   const submitted = "submitted" in sp;
   const facts = submitted
     ? {
-        bp_systolic: numFromSP(sp.bp_systolic),
-        bp_diastolic: numFromSP(sp.bp_diastolic),
-        pain_nrs: numFromSP(sp.pain_nrs),
+        stakeholder_alignment: numFromSP(sp.stakeholder_alignment),
+        operating_clarity: numFromSP(sp.operating_clarity),
+        field_readiness: numFromSP(sp.field_readiness),
+        rollout_risk: numFromSP(sp.rollout_risk),
       }
     : null;
 
@@ -62,12 +63,12 @@ export default async function RunPage({ params, searchParams }: PageProps) {
       <header className="space-y-3">
         <p className="label-mono">AI 相談</p>
         <h1 className="text-3xl md:text-4xl font-light tracking-normal leading-tight">
-          {profile.display_name} さんへの次の一手
+          {profile.display_name} への次の一手
         </h1>
         <p className="text-[var(--fg-muted)] max-w-2xl text-base leading-relaxed">
-          今日の {profile.display_name} さんの様子を入れると、
-          <span className="text-[var(--fg)]">過去の {profile.display_name} さんを全部覚えている AI</span>
-          が、次に何をすればいいか・気をつけること・この人に効くことを教えてくれます。
+          今日の {profile.display_name} の状況を入れると、
+          <span className="text-[var(--fg)]">過去の {profile.display_name} を覚えている AI</span>
+          が、次に何をすればいいか・気をつけること・この相手に効くことを教えてくれます。
         </p>
         <div>
           <Link
@@ -82,12 +83,13 @@ export default async function RunPage({ params, searchParams }: PageProps) {
 
       {/* facts input */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
-        <p className="label-mono mb-4">今日の様子</p>
+        <p className="label-mono mb-4">今日の状況</p>
         <JudgeForm
           defaults={{
-            bp_systolic: numFromSP(sp.bp_systolic) ?? 135,
-            bp_diastolic: numFromSP(sp.bp_diastolic) ?? 85,
-            pain_nrs: numFromSP(sp.pain_nrs) ?? 4,
+            stakeholder_alignment: numFromSP(sp.stakeholder_alignment) ?? 3,
+            operating_clarity: numFromSP(sp.operating_clarity) ?? 2,
+            field_readiness: numFromSP(sp.field_readiness) ?? 4,
+            rollout_risk: numFromSP(sp.rollout_risk) ?? 4,
           }}
         />
       </section>
@@ -98,7 +100,7 @@ export default async function RunPage({ params, searchParams }: PageProps) {
       ) : (
         <section className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/40 p-12 text-center">
           <p className="text-sm text-[var(--fg-muted)]">
-            今日の様子を上に入れて「AI に相談」を押してください。
+            今日の状況を上に入れて「AI に相談」を押してください。
           </p>
         </section>
       )}

@@ -19,7 +19,7 @@ export function AddSessionEventForm({
     <form action={action} className="space-y-3 text-sm">
       <div className="grid md:grid-cols-3 gap-3">
         <div>
-          <Label htmlFor="session_date">セッション日</Label>
+          <Label htmlFor="session_date">支援日</Label>
           <Input
             id="session_date"
             name="session_date"
@@ -38,37 +38,47 @@ export function AddSessionEventForm({
           />
         </div>
         <div>
-          <Label htmlFor="rpe">RPE (6-20)</Label>
-          <Input id="rpe" name="rpe" type="number" min={6} max={20} />
+          <Label htmlFor="stakeholder_alignment">意思決定者の納得度</Label>
+          <Input id="stakeholder_alignment" name="stakeholder_alignment" type="number" min={1} max={5} />
         </div>
         <div>
-          <Label htmlFor="pain_nrs_pre">NRS（前）</Label>
+          <Label htmlFor="operating_clarity">運用設計の明確さ</Label>
           <Input
-            id="pain_nrs_pre"
-            name="pain_nrs_pre"
+            id="operating_clarity"
+            name="operating_clarity"
             type="number"
-            min={0}
-            max={10}
+            min={1}
+            max={5}
           />
         </div>
         <div>
-          <Label htmlFor="pain_nrs_post">NRS（後）</Label>
+          <Label htmlFor="field_readiness">現場の準備度</Label>
           <Input
-            id="pain_nrs_post"
-            name="pain_nrs_post"
+            id="field_readiness"
+            name="field_readiness"
             type="number"
-            min={0}
-            max={10}
+            min={1}
+            max={5}
+          />
+        </div>
+        <div>
+          <Label htmlFor="rollout_risk">展開リスク</Label>
+          <Input
+            id="rollout_risk"
+            name="rollout_risk"
+            type="number"
+            min={1}
+            max={5}
           />
         </div>
       </div>
       <div>
-        <Label htmlFor="session_notes">セッションノート</Label>
+        <Label htmlFor="session_notes">支援メモ</Label>
         <Textarea id="session_notes" name="session_notes" rows={2} />
       </div>
       <div>
-        <Label htmlFor="client_subjective">クライアント主観コメント</Label>
-        <Textarea id="client_subjective" name="client_subjective" rows={2} />
+        <Label htmlFor="client_signal">クライアントの反応・社内シグナル</Label>
+        <Textarea id="client_signal" name="client_signal" rows={2} />
       </div>
       <Button type="submit">Activity イベントを append</Button>
     </form>

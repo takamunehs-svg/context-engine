@@ -1,32 +1,29 @@
 ---
 subject_id: client-c
 display_name: C社（仮）
-type: individual
+type: company
 since: "2025-10"
-primary_concern: 膝痛と歩行機能改善
-medical_notes:
-  - 変形性膝関節症（中期）
-  - 整形外科で運動療法処方あり
+primary_concern: 営業部門でのAI活用定着
 demographics:
-  age_range: 60s
-  sex: M
-  occupation: 退職
+  industry: BtoB SaaS
+  size: 180名規模
+  sponsor: 営業企画
 goals:
-  - 膝痛の管理
-  - 階段昇降の改善
-  - 散歩の継続
-session_frequency: weekly
+  - 商談準備の標準化
+  - ナレッジ共有の仕組み化
+  - マネージャー層のレビュー時間削減
+session_frequency: bi-weekly advisory
 ---
 
 # client-c プロフィール
 
-60代男性、退職後。変形性膝関節症（中期）の診断あり。整形外科の運動療法処方を受けつつ、機能改善・痛み管理を目的に来所。
+C社はBtoB SaaS企業。営業企画主導でAI活用を進めており、3ヶ月伴走済み。現場の一部には定着し始めたが、マネージャー層のレビュー基準がまだばらつく。
 
 ## 注意点
 
-- 変形性膝関節症のため、衝撃の高い種目は避ける
-- 整形外科主治医との連携あり
+- 営業現場は成果直結の話には乗るが、抽象的な研修には反応が薄い
+- マネージャーによってAI出力への許容範囲が違う
 
 ## 関係性メモ
 
-半年継続。寡黙だが質問には丁寧に答えるタイプ。痛みの自己評価が控えめになりがち。
+3ヶ月継続。現場の成功例は出ているが、横展開にはレビュー基準の統一が必要。

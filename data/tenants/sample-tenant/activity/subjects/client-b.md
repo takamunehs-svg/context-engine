@@ -1,28 +1,28 @@
 ---
 subject_id: client-b
 display_name: B社（仮）
-type: individual
+type: company
 since: "2026-04"
-primary_concern: 体重減量
-medical_notes: []
+primary_concern: 生成AI活用の初回相談後
 demographics:
-  age_range: 40s
-  sex: M
-  occupation: 営業職
+  industry: 専門サービス
+  size: 60名規模
+  sponsor: 代表
 goals:
-  - 体重 -5kg
-  - 持久力向上
-session_frequency: bi-weekly
+  - 業務棚卸し
+  - 最初のPoCテーマ選定
+session_frequency: monthly advisory
 ---
 
 # client-b プロフィール
 
-40代男性、営業職。新規。運動経験ほぼなし。体重減量と持久力向上が目標。
+B社は専門サービス企業。初回商談後で、まだ具体テーマを絞る前の段階。Memory は薄く、汎用的な支援方針との差が出にくい。
 
 ## 注意点
 
-- 運動初心者。フォーム指導と漸進的負荷設定が重要
+- 代表の期待値は高いが、現場の業務棚卸しはこれから
+- まず小さな業務1つに絞る必要がある
 
 ## 関係性メモ
 
-開始1ヶ月。まだ反応パターンを探っている段階。
+初回商談後。反応パターンを探っている段階。

@@ -1,19 +1,19 @@
 key: risk_levels
-description: クライアントのリスク階層分類
+description: AI導入・現場展開のリスク階層分類
 levels:
   - id: low
-    label: 低リスク
-    description: 健診結果・既往歴ともに問題なし。一般的な運動指導で対応可
-    next_action: standard_program
-  - id: moderate
-    label: 中リスク
-    description: 軽度の所見あり（軽度高血圧・軽度肥満・軽度関節痛等）。注意観察下で運動指導
-    next_action: monitored_program
+    label: 展開可能
+    description: 合意・運用・現場準備がそろい、小さな展開単位で進められる
+    next_action: rollout_enablement_plan
+  - id: watch
+    label: 論点整理
+    description: 重大な詰まりはないが、次回までに決める論点を絞る必要がある
+    next_action: standard_followup_plan
+  - id: medium
+    label: 合意形成優先
+    description: 担当者だけでは進みにくく、意思決定者向けの整理が必要
+    next_action: executive_alignment_plan
   - id: high
-    label: 高リスク
-    description: 中等度以上の所見あり（中等度以上の高血圧・糖尿病・心血管リスク等）。医療連携を視野
-    next_action: conditional_program_with_medical_consult
-  - id: critical
-    label: 要医療
-    description: 運動禁忌相当。医療機関での評価が先
-    next_action: medical_referral_first
+    label: ガバナンス優先
+    description: 展開前に責任分界・運用ルール・判断基準を固める必要がある
+    next_action: governance_first_plan
