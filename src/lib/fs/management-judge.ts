@@ -29,7 +29,8 @@ export async function judge(input: JudgeInput): Promise<JudgeOutput> {
   const rules = await loadAllRules(tenant_id);
 
   // 2. ルール評価（Phase 0：単純な any/all/default トリガー）
-  const matched = evaluateRules(rules, current_facts);
+  // normalizeRuleFacts により、平坦な形式とネストされた形式の両方を受け付ける。
+  const matched = evaluateRules(rules, normalizeRuleFacts(current_facts));
 
   // 3. Memory 読み込み（ON でも OFF でも件数は表示する）
   const memory = await loadMemory(tenant_id, subject_id);
@@ -82,7 +83,28 @@ async function loadAllRules(tenantId: string): Promise<ManagementRule[]> {
   return all;
 }
 
-function evaluateRules(
+/**
+ * 平坦な facts とネストされた { facts: {...} } 形式の両方を受け付けるよう正規化する。
+ * ルールエンジン境界でのみ呼び出す。元のオブジェクトは変更しない。
+ *
+ * 対応する2つの形式:
+ *   flat:   { stakeholder_alignment: 3, rollout_risk: 4 }
+ *   nested: { facts: { stakeholder_alignment: 3, rollout_risk: 4 } }
+ *
+ * ネスト形式の場合、facts キー配下のフィールドをトップレベルにマージして返す。
+ * これにより、ルール YAML は常にベアフィールド名（例: rollout_risk）で記述できる。
+ */
+export function normalizeRuleFacts(
+  input: Record<string, unknown>
+): Record<string, unknown> {
+  const nested = input['facts'];
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+    return { ...input, ...(nested as Record<string, unknown>) };
+  }
+  return input;
+}
+
+export function evaluateRules(
   rules: ManagementRule[],
   facts: Record<string, unknown>
 ): ManagementRule | null {
