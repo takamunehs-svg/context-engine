@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>context-engine クイックガイド</title>
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --fg: #18181B;
+    --fg-muted: #52525B;
+    --fg-subtle: #71717A;
+    --border: #E5E5E0;
+    --border-strong: #D4D4D0;
+    --accent: #0F766E;
+    --accent-bg: #ECFDF5;
+    --accent-border: #99F6E4;
+    --warn-bg: #FFFBEB;
+    --warn-border: #FDE68A;
+    --warn-fg: #78350F;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family:
+      "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic",
+      "Meiryo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.01em;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 28px 80px;
+  }
+
+  /* Title */
+  .title-block {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 12px;
+    color: var(--fg);
+    letter-spacing: 0.005em;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--fg-muted);
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* Sections */
+  section {
+    margin-bottom: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 32px;
+  }
+
+  h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: var(--fg);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  h2 .step-num {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    min-width: 28px;
+  }
+
+  p {
+    margin: 0 0 12px;
+    color: var(--fg-muted);
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  strong {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  /* Primary CTA */
+  .cta-section {
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+  }
+
+  .cta-section h2 .step-num {
+    color: var(--accent);
+  }
+
+  .cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    transition: opacity 0.2s;
+    margin-top: 8px;
+  }
+
+  .cta-link:hover {
+    opacity: 0.85;
+  }
+
+  .cta-link::after {
+    content: "→";
+    font-weight: 400;
+  }
+
+  .url-display {
+    margin-top: 14px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--fg-subtle);
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  .secondary-url {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--accent-border);
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  .secondary-url a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    word-break: break-all;
+  }
+
+  .secondary-url a:hover {
+    text-decoration: underline;
+  }
+
+  /* Compare panels */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .compare-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 18px 16px;
+    background: #FCFCFA;
+  }
+
+  .compare-card.on {
+    border-color: var(--accent-border);
+    background: var(--accent-bg);
+  }
+
+  .compare-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--fg-subtle);
+    margin: 0 0 6px;
+  }
+
+  .compare-card.on .compare-label {
+    color: var(--accent);
+  }
+
+  .compare-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0 0 8px;
+  }
+
+  .compare-desc {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  /* Steps */
+  ol.steps {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  ol.steps li {
+    counter-increment: step;
+    padding: 14px 0 14px 44px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  ol.steps li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  ol.steps li:first-child {
+    padding-top: 0;
+  }
+
+  ol.steps li::before {
+    content: "0" counter(step);
+    position: absolute;
+    left: 0;
+    top: 12px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  ol.steps li:first-child::before {
+    top: -2px;
+  }
+
+  ol.steps .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    margin: 0 0 4px;
+  }
+
+  ol.steps .step-desc {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin: 0;
+    line-height: 1.65;
+  }
+
+  /* Limitations */
+  .limit-section {
+    background: var(--warn-bg);
+    border-color: var(--warn-border);
+  }
+
+  .limit-list {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--warn-fg);
+  }
+
+  .limit-list li {
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .limit-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--fg-subtle);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer .brand {
+    font-weight: 600;
+    color: var(--fg-muted);
+  }
+
+  footer .host {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+  }
+
+  /* Responsive */
+  @media (max-width: 560px) {
+    .container { padding: 32px 18px 56px; }
+    h1 { font-size: 22px; }
+    section { padding: 22px 20px; }
+    .compare { grid-template-columns: 1fr; }
+    .cta-link { width: 100%; justify-content: center; }
+  }
+
+  /* Print (A4) */
+  @page {
+    size: A4;
+    margin: 16mm;
+  }
+
+  @media print {
+    html, body {
+      background: #FFFFFF;
+      font-size: 11pt;
+    }
+    .container {
+      max-width: 100%;
+      padding: 0;
+    }
+    section {
+      box-shadow: none;
+      page-break-inside: avoid;
+      margin-bottom: 18px;
+      padding: 16px 18px;
+    }
+    .cta-section, .limit-section {
+      background: #FFFFFF !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .cta-link {
+      background: #FFFFFF !important;
+      color: var(--accent) !important;
+      border: 1px solid var(--accent);
+    }
+    .compare-card.on {
+      background: #FFFFFF !important;
+    }
+    a { color: var(--accent); }
+    footer { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="title-block">
+    <p class="eyebrow">CONTEXT-ENGINE クイックガイド</p>
+    <h1>context-engine クイックガイド</h1>
+    <p class="subtitle">支援記録がある場合 / ない場合で、提案がどう変わるかを見るデモ</p>
+  </header>
+
+  <section>
+    <h2>このデモについて</h2>
+    <p>このデモは、過去の支援記録があることで、提案内容がどのように具体化するかを見るための<strong>閲覧専用プレビュー</strong>です。</p>
+    <p>データはすべて<strong>架空のサンプル</strong>です。架空のアドバイザー企業「N社」が、A社・B社・C社を継続支援している想定で作成しています。</p>
+    <p>特に見ていただきたいのは、「<strong>支援記録なし</strong>」と「<strong>支援記録あり</strong>」の比較です。同じ入力情報でも、過去の失敗・判断・効果があった進め方を使うことで、よりその会社に合わせた提案へ変わっていきます。</p>
+  </section>
+
+  <section class="cta-section">
+    <h2><span class="step-num">01</span>最初に見るページ</h2>
+    <p>下のリンクから、A社（仮）の判定結果を入力済みの状態で開けます。一番違いがわかりやすいページです。</p>
+    <a class="cta-link"
+       href="https://context-engine-khaki.vercel.app/t/sample-tenant/subjects/client-a/judge?submitted=1&amp;stakeholder_alignment=3&amp;operating_clarity=2&amp;field_readiness=4&amp;rollout_risk=4&amp;audience=self">
+      デモを見る
+    </a>
+    <p class="url-display">https://context-engine-khaki.vercel.app/t/sample-tenant/subjects/client-a/judge?submitted=1&amp;stakeholder_alignment=3&amp;operating_clarity=2&amp;field_readiness=4&amp;rollout_risk=4&amp;audience=self</p>
+    <div class="secondary-url">
+      <p style="margin:0 0 6px;">支援先一覧から開く場合：</p>
+      <a href="https://context-engine-khaki.vercel.app/t/sample-tenant">https://context-engine-khaki.vercel.app/t/sample-tenant</a>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="step-num">02</span>見ていただきたいポイント</h2>
+    <p>判定結果は、左右に並んで表示されます。</p>
+    <div class="compare">
+      <div class="compare-card">
+        <p class="compare-label">左側 / 支援記録なし</p>
+        <p class="compare-title">一般的な提案</p>
+        <p class="compare-desc">過去の支援記録を使わず、業界共通のルールと現在の入力情報だけで作る、教科書通りの汎用回答。</p>
+      </div>
+      <div class="compare-card on">
+        <p class="compare-label">右側 / 支援記録あり</p>
+        <p class="compare-title">支援先に合わせた提案</p>
+        <p class="compare-desc">過去の失敗・判断・うまくいった進め方を踏まえた、その支援先に合わせた具体的な提案。</p>
+      </div>
+    </div>
+    <p style="margin-top:18px;">同じ入力でも、<strong>支援記録があると提案が具体化する</strong>ことが体感できます。支援記録の蓄積が厚い支援先ほど、右側の出力が大きく変わります。</p>
+  </section>
+
+  <section>
+    <h2><span class="step-num">03</span>結果の読み方</h2>
+    <ol class="steps">
+      <li>
+        <p class="step-title">入力情報を見る</p>
+        <p class="step-desc">画面上部のフォームで、現在の状況（経営層の納得度、運用設計の明確さ、現場の準備度、展開リスク）を確認してください。</p>
+      </li>
+      <li>
+        <p class="step-title">支援記録なし / ありを比較する</p>
+        <p class="step-desc">左の「Memory OFF」と右の「Memory ON」を見比べます。注意点・効きどころ・推奨アクションが、どう具体化するかをご覧ください。</p>
+      </li>
+      <li>
+        <p class="step-title">どの過去記録が提案に効いているかを見る</p>
+        <p class="step-desc">右側のカードでは、過去の判断・失敗・気づきがどう活かされているかが表示されます。「この支援先の効きどころ」のセクションが特にポイントです。</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="limit-section">
+    <h2>現在の制限</h2>
+    <ul class="limit-list">
+      <li><strong>閲覧専用</strong>です。書き込み機能は停止しています。</li>
+      <li>表示されるデータは<strong>すべて架空</strong>のサンプルです。実在の企業・案件・人物とは関係ありません。</li>
+      <li>このプレビューURLの<strong>共有はお控えください</strong>。正式公開は機能拡充後に予定しています。</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span class="brand">context-engine</span>
+    <span>read-only preview</span>
+    <span class="host">context-engine-khaki.vercel.app</span>
+  </footer>
+
+</div>
+</body>
+</html>
