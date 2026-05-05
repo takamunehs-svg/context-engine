@@ -19,7 +19,8 @@ export function JudgeForm({
         <FactInput
           name="stakeholder_alignment"
           label="意思決定者の納得度"
-          unit="1-5"
+          anchorLow="1 反対"
+          anchorHigh="5 合意"
           defaultValue={defaults.stakeholder_alignment}
           min={1}
           max={5}
@@ -27,7 +28,8 @@ export function JudgeForm({
         <FactInput
           name="operating_clarity"
           label="運用設計の明確さ"
-          unit="1-5"
+          anchorLow="1 曖昧"
+          anchorHigh="5 明文化"
           defaultValue={defaults.operating_clarity}
           min={1}
           max={5}
@@ -35,7 +37,8 @@ export function JudgeForm({
         <FactInput
           name="field_readiness"
           label="現場の準備度"
-          unit="1-5"
+          anchorLow="1 未着手"
+          anchorHigh="5 自走可"
           defaultValue={defaults.field_readiness}
           min={1}
           max={5}
@@ -43,7 +46,9 @@ export function JudgeForm({
         <FactInput
           name="rollout_risk"
           label="展開リスク"
-          unit="1-5"
+          anchorLow="1 低"
+          anchorHigh="5 高"
+          inverted
           defaultValue={defaults.rollout_risk}
           min={1}
           max={5}
@@ -63,14 +68,18 @@ export function JudgeForm({
 function FactInput({
   name,
   label,
-  unit,
+  anchorLow,
+  anchorHigh,
+  inverted,
   defaultValue,
   min,
   max,
 }: {
   name: string;
   label: string;
-  unit: string;
+  anchorLow: string;
+  anchorHigh: string;
+  inverted?: boolean;
   defaultValue: number;
   min?: number;
   max?: number;
@@ -79,9 +88,11 @@ function FactInput({
     <label className="block">
       <div className="flex items-baseline justify-between mb-2">
         <span className="text-xs text-[var(--fg-muted)]">{label}</span>
-        <span className="text-[10px] font-mono text-[var(--fg-subtle)]">
-          {unit}
-        </span>
+        {inverted && (
+          <span className="text-[10px] font-mono text-[var(--fg-subtle)]">
+            高=悪い
+          </span>
+        )}
       </div>
       <input
         type="number"
@@ -91,6 +102,10 @@ function FactInput({
         max={max}
         className="w-full rounded-md border border-[var(--border-color)] hover:border-[var(--border-strong)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-subtle)] focus:outline-none bg-[var(--bg)] px-3 py-2.5 text-base font-mono text-[var(--fg)] transition-colors num"
       />
+      <div className="mt-1.5 flex items-center justify-between text-[10px] font-mono text-[var(--fg-subtle)]">
+        <span>{anchorLow}</span>
+        <span>{anchorHigh}</span>
+      </div>
     </label>
   );
 }
