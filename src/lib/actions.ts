@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { assertWritable } from '@/lib/read-only';
 import {
   appendActivityEvent,
   appendMemoryDecision,
@@ -32,6 +33,7 @@ export async function addSessionEventAction(
   subjectId: string,
   formData: FormData
 ) {
+  assertWritable();
   const event: ActivityEvent = {
     id: genId('evt'),
     event_type: 'session',
@@ -62,6 +64,7 @@ export async function addMeasurementEventAction(
   subjectId: string,
   formData: FormData
 ) {
+  assertWritable();
   const event: ActivityEvent = {
     id: genId('evt'),
     event_type: 'measurement',
@@ -92,6 +95,7 @@ export async function addMemoryDecisionAction(
   subjectId: string,
   formData: FormData
 ) {
+  assertWritable();
   const entry: MemoryDecision = {
     id: genId('dec'),
     recorded_at: nowIso(),
@@ -111,6 +115,7 @@ export async function addMemoryFailureAction(
   subjectId: string,
   formData: FormData
 ) {
+  assertWritable();
   const entry: MemoryFailure = {
     id: genId('fail'),
     recorded_at: nowIso(),
@@ -128,6 +133,7 @@ export async function addMemoryExperienceAction(
   subjectId: string,
   formData: FormData
 ) {
+  assertWritable();
   const ew = Number(formData.get('emotional_weight') ?? 5);
   const entry: MemoryExperience = {
     id: genId('exp'),

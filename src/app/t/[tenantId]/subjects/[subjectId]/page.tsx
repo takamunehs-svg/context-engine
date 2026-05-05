@@ -9,6 +9,7 @@ import { AddMemoryDecisionForm } from "./add-memory-decision-form";
 import { AddMemoryFailureForm } from "./add-memory-failure-form";
 import { AddMemoryExperienceForm } from "./add-memory-experience-form";
 import { summarizeEvent } from "@/lib/event-summary";
+import { isReadOnly } from "@/lib/read-only";
 
 interface PageProps {
   params: Promise<{ tenantId: string; subjectId: string }>;
@@ -16,6 +17,7 @@ interface PageProps {
 
 export default async function SubjectPage({ params }: PageProps) {
   const { tenantId, subjectId } = await params;
+  const readOnly = isReadOnly();
   const [meta, profile, events, memory] = await Promise.all([
     getTenantMeta(tenantId),
     getSubjectProfile(tenantId, subjectId),
@@ -121,12 +123,14 @@ export default async function SubjectPage({ params }: PageProps) {
           >
             Memory ({memory.counts.total})
           </TabsTrigger>
-          <TabsTrigger
-            value="add"
-            className="data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-primary)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] data-[state=active]:shadow-none rounded-none px-0 pb-3 font-mono text-xs uppercase tracking-wider text-[var(--fg-muted)]"
-          >
-            Add entry
-          </TabsTrigger>
+          {!readOnly && (
+            <TabsTrigger
+              value="add"
+              className="data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-primary)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] data-[state=active]:shadow-none rounded-none px-0 pb-3 font-mono text-xs uppercase tracking-wider text-[var(--fg-muted)]"
+            >
+              Add entry
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Activity */}
@@ -366,45 +370,47 @@ export default async function SubjectPage({ params }: PageProps) {
         </TabsContent>
 
         {/* Add */}
-        <TabsContent value="add" className="space-y-6 mt-8">
-          <AddCard
-            tag="ACTIVITY"
-            title="セッション記録を追加"
-            desc="append-only"
-          >
-            <AddSessionEventForm tenantId={tenantId} subjectId={subjectId} />
-          </AddCard>
-          <AddCard tag="ACTIVITY" title="測定を追加" desc="append-only">
-            <AddMeasurementEventForm
-              tenantId={tenantId}
-              subjectId={subjectId}
-            />
-          </AddCard>
-          <AddCard
-            tag="MEMORY"
-            title="decision を追加"
-            desc="append-only · subject 固有化を厚くする"
-          >
-            <AddMemoryDecisionForm tenantId={tenantId} subjectId={subjectId} />
-          </AddCard>
-          <AddCard
-            tag="MEMORY"
-            title="failure を追加"
-            desc="失敗ログ · 再発防止資産 · append-only"
-          >
-            <AddMemoryFailureForm tenantId={tenantId} subjectId={subjectId} />
-          </AddCard>
-          <AddCard
-            tag="MEMORY"
-            title="experience を追加"
-            desc="気づき · emotional_weight 1-10 · append-only"
-          >
-            <AddMemoryExperienceForm
-              tenantId={tenantId}
-              subjectId={subjectId}
-            />
-          </AddCard>
-        </TabsContent>
+        {!readOnly && (
+          <TabsContent value="add" className="space-y-6 mt-8">
+            <AddCard
+              tag="ACTIVITY"
+              title="セッション記録を追加"
+              desc="append-only"
+            >
+              <AddSessionEventForm tenantId={tenantId} subjectId={subjectId} />
+            </AddCard>
+            <AddCard tag="ACTIVITY" title="測定を追加" desc="append-only">
+              <AddMeasurementEventForm
+                tenantId={tenantId}
+                subjectId={subjectId}
+              />
+            </AddCard>
+            <AddCard
+              tag="MEMORY"
+              title="decision を追加"
+              desc="append-only · subject 固有化を厚くする"
+            >
+              <AddMemoryDecisionForm tenantId={tenantId} subjectId={subjectId} />
+            </AddCard>
+            <AddCard
+              tag="MEMORY"
+              title="failure を追加"
+              desc="失敗ログ · 再発防止資産 · append-only"
+            >
+              <AddMemoryFailureForm tenantId={tenantId} subjectId={subjectId} />
+            </AddCard>
+            <AddCard
+              tag="MEMORY"
+              title="experience を追加"
+              desc="気づき · emotional_weight 1-10 · append-only"
+            >
+              <AddMemoryExperienceForm
+                tenantId={tenantId}
+                subjectId={subjectId}
+              />
+            </AddCard>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
