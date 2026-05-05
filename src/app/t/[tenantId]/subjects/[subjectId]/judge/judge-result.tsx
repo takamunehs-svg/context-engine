@@ -121,7 +121,7 @@ export function JudgeResult({
         )}
 
         {/* 4. 推奨アクション */}
-        <Section heading={`4. 推奨アクション${output.use_memory ? "（subject 固有化版）" : "（汎用）"}`}>
+        <Section heading={output.use_memory ? "4. 支援先に合わせた推奨アクション" : "4. 推奨アクション（汎用）"}>
           <RecommendationView recommendation={output.recommendation} isOn={isOn} />
         </Section>
       </div>
