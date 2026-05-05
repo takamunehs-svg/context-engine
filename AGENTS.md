@@ -10,6 +10,48 @@ Read at the start of every session:
 
 ---
 
+## このプロジェクトの境界（Project Boundaries）
+
+> 詳細は `事業OS/PROJECT_BOUNDARIES.md` 参照。
+
+**管轄IN**：
+- context-engine 本体の設計・実装
+- 機能拡張（SPEC.md / AGENTS.md 等）
+- 業界テンプレート（Dictionary / Activity / Management Layer）
+- GitHub リポジトリ管理（コード側）
+- ドキュメント整備
+
+**管轄OUT（他プロジェクトに渡す）**：
+
+- 英語圏SNSでの公開戦略（→ sns-strategy）
+- メディア露出（→ 戦略室・content-strategy）
+- 個人事業との接続（→ 戦略室で判断）
+- マーケティング判断（→ sns-strategy / 戦略室）
+
+### 振る舞いルール（越境禁止5原則）
+
+1. 自分の管轄内のタスクのみ実装する
+2. 管轄外のタスクは「[対象プロジェクト名] の管轄です」と一言返して終わる
+3. 「他のプロジェクトも一気に進めるか？」と提案しない
+4. 次のアクション提案は管轄内に限定する
+5. 判断不能・横断判断が必要な場合は「戦略室に戻してください」と伝える
+
+ユーザーが管轄外のタスクを依頼した場合：
+
+- 作業しない
+- 該当プロジェクトを示す
+- 戦略室に戻すべきか判断する
+
+### 作業ワークフロー制約
+
+- `事業OS/` 配下の他プロジェクトのファイルを変更しない
+- `事業OS/PROJECT_BOUNDARIES.md` を上書きしない（戦略室セッションのみ更新権限を持つ）
+- 明示的なバッチ指示なしに広範なリファクタを開始しない
+- 作業フローは常に **audit → fix plan → small batch → verification** の順で進める
+- 1バッチ = 1セッション。バッチ外の作業を提案しない
+
+---
+
 ## Project positioning
 
 A meta-platform that lets you apply a 3-layer architecture
