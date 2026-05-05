@@ -76,19 +76,19 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
           {profile.display_name}
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <span className="text-[var(--fg)]">Management judge</span>
+        <span className="text-[var(--fg)]">支援判断デモ</span>
       </nav>
 
       {/* heading */}
       <header className="space-y-4">
-        <p className="label-mono">MANAGEMENT JUDGE</p>
+        <p className="label-mono">支援判断デモ</p>
         <h1 className="text-4xl md:text-5xl font-light tracking-normal leading-tight max-w-3xl">
           Memory <span className="text-[var(--accent-primary)]">ON / OFF</span>{" "}
           比較
         </h1>
         <p className="text-[var(--fg-muted)] max-w-2xl leading-relaxed">
-          同じ事実に対して、Memory を参照する場合としない場合で出力がどう変わるかを並列表示します。
-          Memory が厚い subject ほど、ON 側で <span className="text-[var(--fg)]">{profile.display_name}</span> 固有の
+          同じ状況に対して、支援記録を使う場合と使わない場合で出力がどう変わるかを並列表示します。
+          支援記録が厚いクライアントほど、あり側で <span className="text-[var(--fg)]">{profile.display_name}</span> 固有の
           反応パターン・過去の失敗・効いた進め方が出力に反映されます。
         </p>
         <div>
@@ -97,7 +97,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
             className="group inline-flex items-center gap-1.5 text-xs font-mono text-[var(--fg-muted)] hover:text-[var(--fg)]"
           >
             <ArrowLeft className="h-3 w-3" strokeWidth={1.5} />
-            subject に戻る
+            支援先に戻る
           </Link>
         </div>
       </header>
@@ -130,11 +130,9 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
 
       {/* Audience selector */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-6">
-        <p className="label-mono mb-2">AUDIENCE — 出力レベル</p>
+        <p className="label-mono mb-2">表示レベル</p>
         <p className="text-xs text-[var(--fg-muted)] mb-4 leading-relaxed">
-          同じ判定でも「誰に見せるか」で Memory の出方が変わります。中間層
-          <code className="mx-1 text-[var(--fg)]">judgment-output.ts</code>
-          が audience 別にフィルタ（SPEC.md §5.4）。
+          同じ判定でも「誰向けに見せるか」で出力の詳細度が変わります。
         </p>
         <div className="flex flex-wrap gap-2">
           {(["self", "team", "client", "demo"] as Audience[]).map((a) => {
@@ -167,10 +165,9 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="label-mono mb-1">MEMORY DEPTH</p>
+            <p className="label-mono mb-1">蓄積された支援記録</p>
             <p className="text-sm text-[var(--fg-muted)]">
-              {profile.display_name} の Episodic Memory · 総 {totalMemory}{" "}
-              entries
+              {profile.display_name} の蓄積された支援記録 · 合計 {totalMemory} 件
             </p>
           </div>
           <span className="font-mono text-3xl font-light text-[var(--accent-primary)] num">
@@ -179,22 +176,22 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
         </div>
         <div className="space-y-3">
           <MemoryBar
-            label="decisions"
+            label="判断記録"
             value={memory.counts.decisions}
             max={maxBar}
           />
           <MemoryBar
-            label="failures"
+            label="失敗・注意点"
             value={memory.counts.failures}
             max={maxBar}
           />
           <MemoryBar
-            label="experiences"
+            label="気づき"
             value={memory.counts.experiences}
             max={maxBar}
           />
           <MemoryBar
-            label="personalization"
+            label="固有化情報"
             value={memory.counts.has_personalization ? 1 : 0}
             max={1}
             displayText={memory.counts.has_personalization ? "あり" : "—"}
@@ -204,7 +201,7 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
 
       {/* facts input */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
-        <p className="label-mono mb-2">INPUT — facts</p>
+        <p className="label-mono mb-2">入力情報 — 現在の状況</p>
         <h2 className="text-xl font-light text-[var(--fg)] mb-1">
           事実を入力
         </h2>
@@ -242,9 +239,9 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
       {submitted && offResult && onResult ? (
         <section id="result" className="space-y-6">
           <div className="flex items-center justify-between">
-            <p className="label-mono">RESULT</p>
+            <p className="label-mono">判定結果</p>
             <p className="text-xs font-mono text-[var(--fg-subtle)]">
-              ↑ 同じ事実に対して、左：汎用 · 右：{profile.display_name} 固有化
+              ↑ 同じ状況に対して、左：汎用 · 右：{profile.display_name} 固有化
             </p>
           </div>
           <div className="grid lg:grid-cols-2 gap-4">
@@ -252,15 +249,15 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
               variant="off"
               title="Memory OFF"
               subtitle="汎用出力"
-              caption="辞書 + ルール + 当該事実のみ。subject 固有の積層は使わない。"
+              caption="辞書 + ルール + 入力情報のみ。支援先固有の蓄積は使わない。"
               icon={<Zap className="h-4 w-4" strokeWidth={1.5} />}
               output={offResult}
             />
             <JudgeResult
               variant="on"
               title="Memory ON"
-              subtitle="subject 固有化"
-              caption="上記 + memory/* の personalization・failures・experiences を Context に積む。"
+              subtitle="支援先を固有化"
+              caption="上記 + この支援先の固有化情報・失敗・気づきを追加して生成。"
               icon={<Sparkles className="h-4 w-4" strokeWidth={1.5} />}
               output={onResult}
             />
@@ -270,9 +267,9 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
         <section id="result" className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/40 p-16 text-center">
           <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
             上のフォームに値を入れて <span className="text-[var(--fg)]">「判定を実行」</span> すると、
-            Memory OFF / ON を並列表示します。
+            支援記録なし / ありを並列表示します。
             <br />
-            Memory が厚い subject ほど、ON 側の出力が大きく固有化します。
+            支援記録が厚いクライアントほど、あり側の出力が大きく固有化します。
           </p>
         </section>
       )}

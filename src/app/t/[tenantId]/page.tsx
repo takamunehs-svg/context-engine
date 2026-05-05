@@ -71,20 +71,20 @@ export default async function TenantPage({ params }: PageProps) {
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="label-mono text-[var(--accent-primary)] mb-2">
-                LAUNCH DEMO
+                デモを体験する
               </p>
               <h2 className="text-2xl font-light tracking-normal text-[var(--fg)]">
-                Memory ON/OFF 比較を入力済みで開く
+                支援記録あり/なしの比較を入力済みで開く
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-[var(--fg-muted)]">
-                client-a は6ヶ月伴走で Memory が最も厚いサンプル。商談デモではここを最初に見せる。
+                A社（仮）は6ヶ月伴走で支援記録が最も厚い架空クライアントです。まずここを見ると違いがわかりやすい。
               </p>
             </div>
             <Link
               href={DEMO_JUDGE_HREF}
               className="group inline-flex w-fit items-center gap-2 rounded-md bg-[var(--accent-primary)] px-5 py-3 text-sm font-medium text-[#052e1c] shadow-[0_0_24px_rgba(16,185,129,0.25)] transition-colors hover:bg-[var(--accent-glow)]"
             >
-              Run comparison
+              支援記録あり/なしの比較を見る
               <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
             </Link>
           </div>
@@ -95,13 +95,13 @@ export default async function TenantPage({ params }: PageProps) {
       <section>
         <div className="mb-8 flex items-end justify-between">
           <div className="space-y-2">
-            <p className="label-mono">SUBJECTS</p>
+            <p className="label-mono">支援先</p>
             <h2 className="text-2xl md:text-3xl font-light tracking-normal">
-              このテナントが抱えるクライアント
+              このデモ環境で支援しているクライアント
             </h2>
           </div>
           <p className="hidden md:block text-xs font-mono text-[var(--fg-subtle)]">
-            Memory 厚さに応じてグロー強度が変わる ↓
+            支援記録の蓄積量でグロー強度が変わる ↓
           </p>
         </div>
 
@@ -116,8 +116,8 @@ export default async function TenantPage({ params }: PageProps) {
         </div>
 
         <p className="mt-8 text-sm text-[var(--fg-muted)] leading-relaxed max-w-2xl">
-          各 subject に入って <span className="text-[var(--fg)]">「Management 判定」</span> を実行すると、
-          Memory ON / OFF を並列表示します。Memory が厚い subject ほど、ON 側の出力が大きく固有化します。
+          各クライアントに入って <span className="text-[var(--fg)]">「支援判断デモ」</span> を実行すると、
+          支援記録あり/なしを並列表示します。支援記録が厚いクライアントほど、あり側の出力が大きく固有化します。
         </p>
       </section>
     </div>
@@ -153,12 +153,12 @@ function SubjectCard({
 
   const depthLabel =
     subject.memory_depth === "thick"
-      ? "Thick"
+      ? "厚い"
       : subject.memory_depth === "medium"
-        ? "Medium"
+        ? "中"
         : subject.memory_depth === "thin"
-          ? "Thin"
-          : "Empty";
+          ? "薄い"
+          : "なし";
 
   const total = subject.counts.total;
   const max = 12;
@@ -170,10 +170,9 @@ function SubjectCard({
       className={`group block rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] p-6 transition-all ${depthClass}`}
     >
       {/* depth badge */}
-      <div className="flex items-center justify-between mb-5">
-        <span className="label-mono text-[var(--fg-subtle)]">{subject.id}</span>
+      <div className="flex items-center justify-end mb-5">
         <span className="rounded-full border border-[var(--border-color)] px-2 py-0.5 text-[10px] font-mono text-[var(--fg-muted)]">
-          memory · {depthLabel}
+          支援記録 · {depthLabel}
         </span>
       </div>
 
@@ -186,10 +185,10 @@ function SubjectCard({
       <div className="mb-4">
         <div className="flex items-baseline justify-between mb-1.5">
           <span className="text-[10px] font-mono text-[var(--fg-subtle)]">
-            MEMORY
+            支援記録
           </span>
           <span className="font-mono text-xs text-[var(--fg)] num">
-            {total} entries
+            {total} 件
           </span>
         </div>
         <div className="h-1 rounded-full bg-[var(--bg)] overflow-hidden">
@@ -202,19 +201,19 @@ function SubjectCard({
 
       {/* counts */}
       <div className="grid grid-cols-2 gap-y-1 text-[11px] font-mono">
-        <span className="text-[var(--fg-subtle)]">decisions</span>
+        <span className="text-[var(--fg-subtle)]">判断記録</span>
         <span className="text-right text-[var(--fg)] num">
           {subject.counts.decisions}
         </span>
-        <span className="text-[var(--fg-subtle)]">failures</span>
+        <span className="text-[var(--fg-subtle)]">失敗・注意点</span>
         <span className="text-right text-[var(--fg)] num">
           {subject.counts.failures}
         </span>
-        <span className="text-[var(--fg-subtle)]">experiences</span>
+        <span className="text-[var(--fg-subtle)]">気づき</span>
         <span className="text-right text-[var(--fg)] num">
           {subject.counts.experiences}
         </span>
-        <span className="text-[var(--fg-subtle)]">personalization</span>
+        <span className="text-[var(--fg-subtle)]">固有化情報</span>
         <span className="text-right text-[var(--fg)]">
           {subject.counts.has_personalization ? "あり" : "—"}
         </span>
@@ -222,7 +221,7 @@ function SubjectCard({
 
       {/* footer */}
       <div className="mt-6 pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
-        <span className="text-xs text-[var(--fg-muted)]">Open subject</span>
+        <span className="text-xs text-[var(--fg-muted)]">詳細を見る</span>
         <ArrowRight
           className="h-3.5 w-3.5 text-[var(--fg-muted)] group-hover:text-[var(--accent-primary)] arrow-slide"
           strokeWidth={1.5}

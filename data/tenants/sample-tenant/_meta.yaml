@@ -4,18 +4,20 @@ applied_template: business-advisory
 template_version: "0.1.0"
 created_at: "2026-04-26"
 description: |
-  Phase 0 デモ用のサンプルテナント。
-  1人のAIネイティブ事業構築アドバイザー（N社）が、3社の継続支援クライアント
-  （client-a, client-b, client-c）を抱えている想定。
-  Memory の厚さが client 間で意図的に差をつけてあり、
-  「使うほど subject 固有化していく」を体感できる構成。
+  このデモは、AI活用支援の仕組みを体験していただくための架空データです。
+
+  架空のアドバイザー企業「N社」が、A社・B社・C社の3社を継続支援している想定です。
+
+  各社には、過去の相談内容、失敗しやすいパターン、効果があった進め方が少しずつ蓄積されています。
+
+  この蓄積によって、一般的な助言から「その会社に合わせた具体的な提案」へ変わっていく様子を確認できます。
 subjects:
   - id: client-a
-    label: A社（厚いMemory・6ヶ月伴走）
+    label: A社（仮）
     memory_depth: thick
   - id: client-b
-    label: B社（薄いMemory・初回商談後）
+    label: B社（仮）
     memory_depth: thin
   - id: client-c
-    label: C社（中Memory・3ヶ月伴走）
+    label: C社（仮）
     memory_depth: medium

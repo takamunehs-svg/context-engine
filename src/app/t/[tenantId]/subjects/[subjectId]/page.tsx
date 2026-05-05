@@ -41,7 +41,7 @@ export default async function SubjectPage({ params }: PageProps) {
       {/* heading */}
       <header className="flex items-start justify-between flex-wrap gap-4">
         <div className="space-y-3">
-          <p className="label-mono">SUBJECT</p>
+          <p className="label-mono">支援先</p>
           <h1 className="text-4xl md:text-5xl font-light tracking-normal text-[var(--fg)]">
             {profile.display_name}
           </h1>
@@ -66,7 +66,7 @@ export default async function SubjectPage({ params }: PageProps) {
           className="group inline-flex items-center gap-2 rounded-md bg-[var(--accent-primary)] hover:bg-[var(--accent-glow)] px-5 py-3 text-sm font-medium text-[#052e1c] transition-colors shadow-[0_0_24px_rgba(16,185,129,0.25)]"
         >
           <Sparkles className="h-4 w-4" strokeWidth={1.5} />
-          Management 判定（Memory ON/OFF 比較）
+          支援判断デモ（支援記録あり/なし比較）
           <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
         </Link>
       </header>
@@ -74,7 +74,7 @@ export default async function SubjectPage({ params }: PageProps) {
       {/* profile */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
         <div className="flex items-center justify-between mb-6">
-          <p className="label-mono">PROFILE</p>
+          <p className="label-mono">プロフィール</p>
           <span className="font-mono text-[10px] text-[var(--fg-subtle)]">
             activity/subjects/{subjectId}.md
           </span>
@@ -115,13 +115,13 @@ export default async function SubjectPage({ params }: PageProps) {
             value="activity"
             className="data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-primary)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] data-[state=active]:shadow-none rounded-none px-0 pb-3 font-mono text-xs uppercase tracking-wider text-[var(--fg-muted)]"
           >
-            Activity ({events.length})
+            活動記録 ({events.length})
           </TabsTrigger>
           <TabsTrigger
             value="memory"
             className="data-[state=active]:bg-transparent data-[state=active]:text-[var(--accent-primary)] data-[state=active]:border-b-2 data-[state=active]:border-[var(--accent-primary)] data-[state=active]:shadow-none rounded-none px-0 pb-3 font-mono text-xs uppercase tracking-wider text-[var(--fg-muted)]"
           >
-            Memory ({memory.counts.total})
+            支援記録 ({memory.counts.total})
           </TabsTrigger>
           {!readOnly && (
             <TabsTrigger
@@ -204,16 +204,16 @@ export default async function SubjectPage({ params }: PageProps) {
           <Tabs defaultValue="decisions">
             <TabsList className="bg-[var(--bg-elevated)] border border-[var(--border-color)] rounded-md p-1">
               <TabsTrigger value="decisions" className="text-xs font-mono">
-                decisions ({memory.counts.decisions})
+                判断記録 ({memory.counts.decisions})
               </TabsTrigger>
               <TabsTrigger value="failures" className="text-xs font-mono">
-                failures ({memory.counts.failures})
+                失敗・注意点 ({memory.counts.failures})
               </TabsTrigger>
               <TabsTrigger value="experiences" className="text-xs font-mono">
-                experiences ({memory.counts.experiences})
+                気づき ({memory.counts.experiences})
               </TabsTrigger>
               <TabsTrigger value="personalization" className="text-xs font-mono">
-                personalization
+                固有化情報
               </TabsTrigger>
             </TabsList>
 

@@ -95,7 +95,7 @@ function Footer() {
               />
             </div>
             <p className="text-xs text-[var(--fg-muted)] font-mono">
-              Phase 0 · File System First
+              初期デモ · File System First
             </p>
           </div>
           <div className="md:col-span-2 space-y-4">

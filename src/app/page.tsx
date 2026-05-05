@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { listTenants } from "@/lib/fs/tenant";
 import { ArrowRight, ArrowUpRight, Layers, FileText, GitBranch, Brain } from "lucide-react";
-import { DEMO_JUDGE_HREF, DEMO_SUBJECT_ID, DEMO_TENANT_HREF } from "@/lib/demo-links";
+import { DEMO_JUDGE_HREF, DEMO_TENANT_HREF } from "@/lib/demo-links";
 
 export default async function HomePage() {
   const tenants = await listTenants();
@@ -59,14 +59,14 @@ function Hero() {
               href={DEMO_JUDGE_HREF}
               className="group inline-flex items-center gap-2 rounded-md bg-[var(--accent-primary)] hover:bg-[var(--accent-glow)] px-5 py-3 text-sm font-medium text-[#052e1c] transition-colors shadow-[0_0_24px_rgba(16,185,129,0.25)]"
             >
-              Run Memory comparison
+              支援記録あり/なしの比較を見る
               <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
             </Link>
             <Link
               href={DEMO_TENANT_HREF}
               className="group inline-flex items-center gap-2 rounded-md border border-[var(--border-color)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] px-5 py-3 text-sm font-mono text-[var(--fg)] transition-colors"
             >
-              Open tenant workspace
+              デモ環境を開く
               <ArrowUpRight className="h-4 w-4 arrow-slide" strokeWidth={1.5} />
             </Link>
           </div>
@@ -80,24 +80,24 @@ function LaunchRunway() {
   const items = [
     {
       label: "01",
-      title: "Memory ON/OFF",
-      copy: `${DEMO_SUBJECT_ID} の判定結果を、入力済みの状態で開く。`,
+      title: "支援記録あり/なしの比較",
+      copy: "A社（仮）の判定結果を、値を入力した状態で開く。",
       href: DEMO_JUDGE_HREF,
-      cta: "Run comparison",
+      cta: "比較を見る",
     },
     {
       label: "02",
-      title: "Tenant workspace",
-      copy: "テナント共通の辞書と subject 別 Memory の分離を見る。",
+      title: "デモ環境",
+      copy: "テナント共通の辞書と、クライアント別の支援記録の分離を見る。",
       href: DEMO_TENANT_HREF,
-      cta: "Open workspace",
+      cta: "デモを開く",
     },
     {
       label: "03",
       title: "Dictionary Layer",
       copy: "判断基準が tenant 単位で共有される構造を確認する。",
       href: `${DEMO_TENANT_HREF}/dictionary`,
-      cta: "View dictionary",
+      cta: "辞書を見る",
     },
   ];
 
@@ -288,7 +288,7 @@ function TheCore() {
                 href="/t/sample-tenant"
                 className="group inline-flex items-center gap-2 text-[var(--accent-primary)] hover:text-[var(--accent-glow)] text-sm font-mono"
               >
-                Try this with sample-tenant
+                デモを体験する
                 <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
               </Link>
             </div>
@@ -427,7 +427,7 @@ function Principles() {
 // ─────────────────────────────────────────────────────────
 
 const industries = [
-  { en: "Business Advisory", jp: "AI導入支援", state: "Phase 0 同梱", active: true },
+  { en: "Business Advisory", jp: "AI導入支援", state: "初期デモ同梱", active: true },
   { en: "Team Sports", jp: "チームスポーツ", state: "Phase 1-2", active: false },
   { en: "Education", jp: "教育", state: "Phase 1-2", active: false },
   { en: "Health Coaching", jp: "健康指導", state: "Phase 1-2", active: false },
