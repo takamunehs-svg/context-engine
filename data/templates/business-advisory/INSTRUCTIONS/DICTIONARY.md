@@ -13,9 +13,9 @@ description: Dictionary Layer モジュール — 判定基準・閾値・参照
 | ファイル | 内容 |
 |---|---|
 | `dictionary/_schema.yaml` | 辞書層全体のスキーマ定義 |
-| `dictionary/classifications/risk-levels.yaml` | リスク階層分類（low/moderate/high/critical） |
-| `dictionary/thresholds/intervention-thresholds.yaml` | 介入判定閾値 |
-| `dictionary/references/program-design.md` | プログラム設計の参照モデル |
+| `dictionary/classifications/risk-levels.yaml` | 展開リスク分類（high/medium/watch/low） |
+| `dictionary/thresholds/intervention-thresholds.yaml` | 次アクション判定閾値 |
+| `dictionary/references/program-design.md` | 支援設計の参照モデル |
 | `dictionary/glossary.md` | 用語集 |
 
 ## 読む順序

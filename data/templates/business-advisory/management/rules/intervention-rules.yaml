@@ -1,0 +1,36 @@
+version: "0.1.0"
+description: 次アクション判定ルール（テーブル駆動）
+rules:
+  - rule_id: governance_gap_high
+    trigger: all
+    conditions:
+      - { field: rollout_risk, op: ">=", value: 4 }
+      - { field: operating_clarity, op: "<=", value: 2 }
+    output:
+      risk_level: high
+      action: governance_first_plan
+      rationale: 現場展開前に責任分界・運用ルールを固める必要がある
+  - rule_id: executive_alignment_needed
+    trigger: all
+    conditions:
+      - { field: stakeholder_alignment, op: "<=", value: 2 }
+    output:
+      risk_level: medium
+      action: executive_alignment_plan
+      rationale: 担当者だけでは社内合意が進みにくいため、意思決定者向けの整理を優先する
+  - rule_id: rollout_ready
+    trigger: all
+    conditions:
+      - { field: field_readiness, op: ">=", value: 4 }
+      - { field: operating_clarity, op: ">=", value: 3 }
+      - { field: rollout_risk, op: "<=", value: 3 }
+    output:
+      risk_level: low
+      action: rollout_enablement_plan
+      rationale: 展開準備は整っているため、小さな単位で現場定着へ進める
+  - rule_id: discovery_default
+    trigger: default
+    output:
+      risk_level: watch
+      action: standard_followup_plan
+      rationale: 重大な詰まりはないが、次回までに論点を絞る必要がある

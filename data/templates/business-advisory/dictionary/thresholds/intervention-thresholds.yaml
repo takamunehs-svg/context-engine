@@ -1,0 +1,27 @@
+key: intervention_thresholds
+description: 次アクション判定の閾値
+thresholds:
+  - id: governance_gap_trigger
+    field: rollout_risk
+    op: ">="
+    value: 4
+    action: governance_first_plan
+    rationale: 展開リスクが高い。運用ルール整備を先行させる
+  - id: alignment_gap_trigger
+    field: stakeholder_alignment
+    op: "<="
+    value: 2
+    action: executive_alignment_plan
+    rationale: 経営層の納得度が低い。意思決定資料の整備が先
+  - id: rollout_ready_trigger
+    field: field_readiness
+    op: ">="
+    value: 4
+    action: rollout_enablement_plan
+    rationale: 現場準備が整っている。小さな成功例を作る段階
+  - id: standard_followup_trigger
+    field: rollout_risk
+    op: "<="
+    value: 3
+    action: standard_followup_plan
+    rationale: 重大な詰まりなし。通常の論点整理で継続

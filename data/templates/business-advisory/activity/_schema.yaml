@@ -1,0 +1,40 @@
+version: "0.1.0"
+description: AIネイティブ事業支援テンプレ Activity Layer スキーマ
+event_types:
+  - id: session
+    label: 支援セッション記録
+    fields:
+      facts:
+        - { key: session_date, type: date, required: true }
+        - { key: duration_min, type: integer, required: true }
+        - { key: stakeholder_alignment, type: integer, range: [1, 5] }
+        - { key: operating_clarity, type: integer, range: [1, 5] }
+        - { key: field_readiness, type: integer, range: [1, 5] }
+        - { key: rollout_risk, type: integer, range: [1, 5] }
+      inputs:
+        - { key: session_notes, type: text }
+        - { key: client_signal, type: text, label: クライアントの反応・社内シグナル }
+      refs:
+        - { key: plan_id, type: string }
+  - id: measurement
+    label: 進捗測定
+    fields:
+      facts:
+        - { key: measured_date, type: date, required: true }
+        - { key: milestone_progress_pct, type: integer, range: [0, 100] }
+        - { key: decision_latency_days, type: integer }
+        - { key: adoption_readiness, type: integer, range: [1, 5] }
+      inputs:
+        - { key: notes, type: text }
+  - id: intake
+    label: ヒアリング
+    fields:
+      facts:
+        - { key: industry, type: string }
+        - { key: size, type: string }
+        - { key: sponsor, type: string }
+        - { key: primary_concern, type: text }
+      inputs:
+        - { key: goals, type: text }
+        - { key: constraints, type: text }
+append_only: true

@@ -1,10 +1,10 @@
 version: "0.1.0"
-description: 健康指導テンプレ辞書層スキーマ
+description: AIネイティブ事業支援テンプレ辞書層スキーマ
 sections:
   classifications:
-    description: 分類体系
+    description: 展開リスク・支援フェーズ分類
     files:
-      - risk-levels.yaml      # リスク階層
+      - risk-levels.yaml
   thresholds:
     description: 判定閾値
     files:

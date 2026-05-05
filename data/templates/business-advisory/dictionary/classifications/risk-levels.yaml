@@ -1,0 +1,19 @@
+key: risk_levels
+description: 展開リスク・支援難度の分類
+levels:
+  - id: low
+    label: 低リスク
+    description: 合意形成・運用設計・現場準備がそろっており、通常の伴走で進められる
+    next_action: standard_followup_plan
+  - id: watch
+    label: 経過観察
+    description: 論点はあるが重大な詰まりはない。論点整理と次回確認で進める
+    next_action: standard_followup_plan
+  - id: medium
+    label: 中リスク
+    description: 経営層または現場のいずれかに課題あり。優先課題に絞って対処が必要
+    next_action: executive_alignment_plan
+  - id: high
+    label: 高リスク
+    description: ガバナンスが未整備、または複数の詰まりが重なっており、展開に先立つ整備が必要
+    next_action: governance_first_plan
