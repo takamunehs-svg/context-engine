@@ -5,6 +5,7 @@ import type {
   JudgmentMemorySection,
   JudgmentBullet,
 } from "@/lib/judgment-output";
+import { humanizeKey } from "@/lib/labels";
 
 // ─────────────────────────────────────────────
 // JudgeResult
@@ -152,7 +153,7 @@ function FactsList({ facts }: { facts: Record<string, unknown> }) {
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-mono">
       {entries.map(([k, v]) => (
         <li key={k}>
-          <span className="text-[var(--fg-subtle)]">{humanKey(k)}</span>
+          <span className="text-[var(--fg-subtle)]">{humanizeKey(k)}</span>
           <span className="mx-1 text-[var(--fg-subtle)]">:</span>
           <span className="text-[var(--fg)]">{String(v)}</span>
         </li>
@@ -348,16 +349,3 @@ function RecommendationView({
   );
 }
 
-// ─────────────────────────────────────────────
-// utils
-// ─────────────────────────────────────────────
-
-function humanKey(key: string): string {
-  const labels: Record<string, string> = {
-    stakeholder_alignment: "意思決定者の納得度",
-    operating_clarity: "運用設計の明確さ",
-    field_readiness: "現場の準備度",
-    rollout_risk: "展開リスク",
-  };
-  return labels[key] ?? key.replace(/_/g, " ").replace(/\./g, " › ");
-}

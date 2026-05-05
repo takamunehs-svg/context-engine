@@ -3,6 +3,7 @@
 // facts / inputs から自動的に主要キーを抽出して 1行サマリ + ノート + フォールバック JSON を返す。
 
 import type { ActivityEvent } from "@/types/core";
+import { humanizeKey } from "@/lib/labels";
 
 export interface EventSummary {
   date: string; // ISO 日付部分のみ（YYYY-MM-DD）
@@ -71,23 +72,6 @@ function isScalar(v: unknown): boolean {
   );
 }
 
-function humanizeKey(key: string): string {
-  const labels: Record<string, string> = {
-    session_date: "支援日",
-    measured_date: "チェック日",
-    duration_min: "時間",
-    stakeholder_alignment: "意思決定者の納得度",
-    operating_clarity: "運用設計の明確さ",
-    field_readiness: "現場の準備度",
-    rollout_risk: "展開リスク",
-    milestone_progress_pct: "マイルストーン進捗",
-    decision_latency_days: "意思決定の停滞日数",
-    adoption_readiness: "定着準備度",
-  };
-  if (labels[key]) return labels[key];
-  // snake_case.dotted → "snake case › dotted"
-  return key.replace(/_/g, " ").replace(/\./g, " › ");
-}
 
 function truncate(s: string): string {
   if (s.length <= MAX_METRIC_VALUE_LEN) return s;
