@@ -102,29 +102,31 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
         </div>
       </header>
 
-      {/* この画面は何? */}
-      <section className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/50 p-6">
-        <p className="label-mono mb-3">この画面は何？</p>
-        <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
-          「今{" "}
-          <span className="text-[var(--fg)]">{profile.display_name}</span>{" "}
-          にこういう状況が出ました、どう動けばいい？」を{" "}
-          <span className="text-[var(--fg)]">AI に相談する画面</span>。 AI は{" "}
-          <span className="text-[var(--fg)]">ルールブック</span>
-          （業者の判断基準）と{" "}
-          <span className="text-[var(--fg)]">取扱い説明書</span>（
-          {profile.display_name} 専用の積み上げ）を見て答えます。
-        </p>
-        <p className="text-sm text-[var(--fg-muted)] leading-relaxed mt-3">
-          下で{" "}
-          <span className="text-[var(--fg)]">
-            Memory OFF と ON を並べて表示
-          </span>
-          し、「教科書通りの汎用回答」と「{profile.display_name}{" "}
-          専用に育った回答」の差を見せます。Memory が厚くなるほど、ON 側が{" "}
-          {profile.display_name} 固有に変化します。
-        </p>
-      </section>
+      {/* この画面は何? — 初回のみ表示。submitted 時は結果に集中するため非表示。 */}
+      {!submitted && (
+        <section className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/50 p-6">
+          <p className="label-mono mb-3">この画面は何？</p>
+          <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
+            「今{" "}
+            <span className="text-[var(--fg)]">{profile.display_name}</span>{" "}
+            にこういう状況が出ました、どう動けばいい？」を{" "}
+            <span className="text-[var(--fg)]">AI に相談する画面</span>。 AI は{" "}
+            <span className="text-[var(--fg)]">ルールブック</span>
+            （業者の判断基準）と{" "}
+            <span className="text-[var(--fg)]">取扱い説明書</span>（
+            {profile.display_name} 専用の積み上げ）を見て答えます。
+          </p>
+          <p className="text-sm text-[var(--fg-muted)] leading-relaxed mt-3">
+            下で{" "}
+            <span className="text-[var(--fg)]">
+              Memory OFF と ON を並べて表示
+            </span>
+            し、「教科書通りの汎用回答」と「{profile.display_name}{" "}
+            専用に育った回答」の差を見せます。Memory が厚くなるほど、ON 側が{" "}
+            {profile.display_name} 固有に変化します。
+          </p>
+        </section>
+      )}
 
       {/* Audience selector */}
       <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-6">
@@ -200,7 +202,82 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
         </div>
       </section>
 
-      {/* long-term accumulation */}
+      {/* facts input */}
+      <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
+        <p className="label-mono mb-2">INPUT — facts</p>
+        <h2 className="text-xl font-light text-[var(--fg)] mb-1">
+          事実を入力
+        </h2>
+        <p className="text-sm text-[var(--fg-muted)] mb-6">
+          導入・展開フェーズの事実で、辞書層のルールがマッチします。
+        </p>
+        <div className="mb-8 rounded-md border border-[var(--border-color)] bg-[var(--bg)] p-4">
+          <p className="label-mono mb-2 text-[var(--fg-subtle)]">
+            今回のデモ前提
+          </p>
+          <p className="text-sm leading-relaxed text-[var(--fg-muted)]">
+            <span className="text-[var(--fg)]">{profile.display_name}</span>
+            （6ヶ月伴走中）— PoC が現場展開フェーズに入った段階。
+            <span className="text-[var(--fg)]">経営層は半信半疑</span>
+            （納得度3）、
+            <span className="text-[var(--fg)]">運用ルール未整備</span>
+            （明確さ2）、
+            <span className="text-[var(--fg)]">現場は前向き</span>
+            （準備度4）、ただし
+            <span className="text-[var(--fg)]">展開リスクは高い</span>
+            （リスク4）。
+          </p>
+        </div>
+        <JudgeForm
+          defaults={{
+            stakeholder_alignment: numFromSP(sp.stakeholder_alignment) ?? 3,
+            operating_clarity: numFromSP(sp.operating_clarity) ?? 2,
+            field_readiness: numFromSP(sp.field_readiness) ?? 4,
+            rollout_risk: numFromSP(sp.rollout_risk) ?? 4,
+          }}
+        />
+      </section>
+
+      {/* result */}
+      {submitted && offResult && onResult ? (
+        <section id="result" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <p className="label-mono">RESULT</p>
+            <p className="text-xs font-mono text-[var(--fg-subtle)]">
+              ↑ 同じ事実に対して、左：汎用 · 右：{profile.display_name} 固有化
+            </p>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-4">
+            <JudgeResult
+              variant="off"
+              title="Memory OFF"
+              subtitle="汎用出力"
+              caption="辞書 + ルール + 当該事実のみ。subject 固有の積層は使わない。"
+              icon={<Zap className="h-4 w-4" strokeWidth={1.5} />}
+              output={offResult}
+            />
+            <JudgeResult
+              variant="on"
+              title="Memory ON"
+              subtitle="subject 固有化"
+              caption="上記 + memory/* の personalization・failures・experiences を Context に積む。"
+              icon={<Sparkles className="h-4 w-4" strokeWidth={1.5} />}
+              output={onResult}
+            />
+          </div>
+        </section>
+      ) : (
+        <section id="result" className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/40 p-16 text-center">
+          <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
+            上のフォームに値を入れて <span className="text-[var(--fg)]">「判定を実行」</span> すると、
+            Memory OFF / ON を並列表示します。
+            <br />
+            Memory が厚い subject ほど、ON 側の出力が大きく固有化します。
+          </p>
+        </section>
+      )}
+
+      {/* long-term accumulation — 結果を見たあとの長期視点として配置 */}
       <section className="rounded-lg border border-[var(--accent-border)] bg-[var(--bg-elevated)] memory-on-bg p-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           <div>
@@ -237,64 +314,6 @@ export default async function JudgePage({ params, searchParams }: PageProps) {
           </div>
         </div>
       </section>
-
-      {/* facts input */}
-      <section className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] p-8">
-        <p className="label-mono mb-2">INPUT — facts</p>
-        <h2 className="text-xl font-light text-[var(--fg)] mb-1">
-          事実を入力
-        </h2>
-        <p className="text-sm text-[var(--fg-muted)] mb-8">
-          導入・展開フェーズの事実で、辞書層のルールがマッチします。
-        </p>
-        <JudgeForm
-          defaults={{
-            stakeholder_alignment: numFromSP(sp.stakeholder_alignment) ?? 3,
-            operating_clarity: numFromSP(sp.operating_clarity) ?? 2,
-            field_readiness: numFromSP(sp.field_readiness) ?? 4,
-            rollout_risk: numFromSP(sp.rollout_risk) ?? 4,
-          }}
-        />
-      </section>
-
-      {/* result */}
-      {submitted && offResult && onResult ? (
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <p className="label-mono">RESULT</p>
-            <p className="text-xs font-mono text-[var(--fg-subtle)]">
-              ↑ 同じ事実に対して、左：汎用 · 右：{profile.display_name} 固有化
-            </p>
-          </div>
-          <div className="grid lg:grid-cols-2 gap-4">
-            <JudgeResult
-              variant="off"
-              title="Memory OFF"
-              subtitle="汎用出力"
-              caption="辞書 + ルール + 当該事実のみ。subject 固有の積層は使わない。"
-              icon={<Zap className="h-4 w-4" strokeWidth={1.5} />}
-              output={offResult}
-            />
-            <JudgeResult
-              variant="on"
-              title="Memory ON"
-              subtitle="subject 固有化"
-              caption="上記 + memory/* の personalization・failures・experiences を Context に積む。"
-              icon={<Sparkles className="h-4 w-4" strokeWidth={1.5} />}
-              output={onResult}
-            />
-          </div>
-        </section>
-      ) : (
-        <section className="rounded-lg border border-dashed border-[var(--border-color)] bg-[var(--bg-elevated)]/40 p-16 text-center">
-          <p className="text-sm text-[var(--fg-muted)] leading-relaxed">
-            上のフォームに値を入れて <span className="text-[var(--fg)]">「判定を実行」</span> すると、
-            Memory OFF / ON を並列表示します。
-            <br />
-            Memory が厚い subject ほど、ON 側の出力が大きく固有化します。
-          </p>
-        </section>
-      )}
     </div>
   );
 }
