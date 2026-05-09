@@ -54,21 +54,26 @@ function Hero() {
             </p>
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center gap-3">
-            <Link
-              href={DEMO_JUDGE_HREF}
-              className="group inline-flex items-center gap-2 rounded-md bg-[var(--accent-primary)] hover:bg-[var(--accent-glow)] px-5 py-3 text-sm font-medium text-[#052e1c] transition-colors shadow-[0_0_24px_rgba(16,185,129,0.25)]"
-            >
-              支援記録あり/なしの比較を見る
-              <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
-            </Link>
-            <Link
-              href={DEMO_TENANT_HREF}
-              className="group inline-flex items-center gap-2 rounded-md border border-[var(--border-color)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-elevated)] px-5 py-3 text-sm font-mono text-[var(--fg)] transition-colors"
-            >
-              デモ環境を開く
-              <ArrowUpRight className="h-4 w-4 arrow-slide" strokeWidth={1.5} />
-            </Link>
+          <div className="mt-12 space-y-3">
+            <p className="label-mono text-[var(--accent-primary)]">
+              まずはここから · 30秒で支援記録の差を見る
+            </p>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link
+                href={DEMO_JUDGE_HREF}
+                className="group inline-flex items-center gap-2 rounded-md bg-[var(--accent-primary)] hover:bg-[var(--accent-glow)] px-5 py-3 text-sm font-medium text-[#052e1c] transition-colors shadow-[0_0_24px_rgba(16,185,129,0.25)]"
+              >
+                支援記録あり/なしの比較を見る
+                <ArrowRight className="h-4 w-4 arrow-slide" strokeWidth={2} />
+              </Link>
+              <Link
+                href={DEMO_TENANT_HREF}
+                className="group inline-flex items-center gap-1.5 text-sm font-mono text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+              >
+                デモ環境を開く
+                <ArrowUpRight className="h-3.5 w-3.5 arrow-slide" strokeWidth={1.5} />
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -104,6 +109,12 @@ function LaunchRunway() {
   return (
     <section className="border-t border-[var(--border-color)] bg-[var(--bg-subtle)]/30">
       <div className="mx-auto max-w-7xl px-6 md:px-8 py-12">
+        <div className="mb-6">
+          <p className="label-mono mb-1">他の入口</p>
+          <p className="text-xs text-[var(--fg-muted)]">
+            デモを別のルートで見たい場合はこちら。Hero の主ルートで十分な場合はスキップしてください。
+          </p>
+        </div>
         <div className="grid gap-px overflow-hidden rounded-lg border border-[var(--border-color)] bg-[var(--border-color)] md:grid-cols-3">
           {items.map((item) => (
             <Link
