@@ -139,7 +139,10 @@ export default async function SubjectPage({ params }: PageProps) {
             append-only · 既存行は変更されません · 補正は新イベントで上書き
           </p>
           {events.length === 0 && (
-            <p className="text-sm text-[var(--fg-muted)]">イベントなし</p>
+            <div className="space-y-1">
+              <p className="text-sm text-[var(--fg-muted)]">まだ活動記録がありません。</p>
+              <p className="text-xs text-[var(--fg-muted)]">セッション記録や測定を追加すると、ここに時系列で表示されます。</p>
+            </div>
           )}
           <ol className="relative border-l border-[var(--border-color)] pl-6 space-y-4">
             {events
@@ -219,7 +222,10 @@ export default async function SubjectPage({ params }: PageProps) {
 
             <TabsContent value="decisions" className="space-y-3 mt-6">
               {memory.decisions.length === 0 && (
-                <p className="text-sm text-[var(--fg-muted)]">エントリなし</p>
+                <div className="space-y-1">
+                  <p className="text-sm text-[var(--fg-muted)]">まだ判断記録がありません。</p>
+                  <p className="text-xs text-[var(--fg-muted)]">「判断 → 理由 → 結果」を蓄積すると、支援判断デモの Memory 参照に反映されます。</p>
+                </div>
               )}
               {memory.decisions.slice().reverse().map((d) => (
                 <article
@@ -270,7 +276,10 @@ export default async function SubjectPage({ params }: PageProps) {
 
             <TabsContent value="failures" className="space-y-3 mt-6">
               {memory.failures.length === 0 && (
-                <p className="text-sm text-[var(--fg-muted)]">エントリなし</p>
+                <div className="space-y-1">
+                  <p className="text-sm text-[var(--fg-muted)]">まだ失敗ログがありません。</p>
+                  <p className="text-xs text-[var(--fg-muted)]">避けるべきパターンを記録すると、推奨アクションの「注意」欄に反映されます。</p>
+                </div>
               )}
               {memory.failures.slice().reverse().map((f) => (
                 <article
@@ -315,7 +324,10 @@ export default async function SubjectPage({ params }: PageProps) {
 
             <TabsContent value="experiences" className="space-y-3 mt-6">
               {memory.experiences.length === 0 && (
-                <p className="text-sm text-[var(--fg-muted)]">エントリなし</p>
+                <div className="space-y-1">
+                  <p className="text-sm text-[var(--fg-muted)]">まだ気づき記録がありません。</p>
+                  <p className="text-xs text-[var(--fg-muted)]">emotional_weight の高いエピソードほど、推奨アクションの「効きどころ」に反映されます。</p>
+                </div>
               )}
               {memory.experiences.slice().reverse().map((e) => (
                 <article
@@ -362,7 +374,10 @@ export default async function SubjectPage({ params }: PageProps) {
                     {memory.personalization.trim()}
                   </pre>
                 ) : (
-                  <p className="text-sm text-[var(--fg-muted)]">未作成</p>
+                  <div className="space-y-1">
+                    <p className="text-sm text-[var(--fg-muted)]">personalization.md が未作成です。</p>
+                    <p className="text-xs text-[var(--fg-muted)]">反応パターン・生活制約・コミュニケーション特性を記述すると、支援判断デモの Memory 参照で使われます。</p>
+                  </div>
                 )}
               </article>
             </TabsContent>
