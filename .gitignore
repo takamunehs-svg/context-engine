@@ -47,6 +47,9 @@ next-env.d.ts
 # internal docs (PLAN.md, DESIGN.md, etc.)
 /docs/internal/
 
+# Internal project status
+/STATUS.md
+
 # editor / IDE
 .vscode/
 .idea/
