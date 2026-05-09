@@ -53,12 +53,12 @@ function Header() {
           >
             Dictionary
           </Link>
-          <a
-            href="#principles"
+          <Link
+            href="/#principles"
             className="hover:text-[var(--fg)] transition-colors"
           >
             Principles
-          </a>
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
           <Link
@@ -77,6 +77,26 @@ function Header() {
           </Link>
         </div>
       </div>
+      <nav className="md:hidden flex items-center gap-5 px-6 pb-2 text-xs font-mono text-[var(--fg-muted)]">
+        <Link
+          href={DEMO_TENANT_HREF}
+          className="hover:text-[var(--fg)] transition-colors"
+        >
+          Demo
+        </Link>
+        <Link
+          href={`${DEMO_TENANT_HREF}/dictionary`}
+          className="hover:text-[var(--fg)] transition-colors"
+        >
+          Dictionary
+        </Link>
+        <Link
+          href="/#principles"
+          className="hover:text-[var(--fg)] transition-colors"
+        >
+          Principles
+        </Link>
+      </nav>
     </header>
   );
 }
