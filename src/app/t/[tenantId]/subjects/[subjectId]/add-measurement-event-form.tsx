@@ -36,10 +36,12 @@ export function AddMeasurementEventForm({
           <Label htmlFor="decision_latency_days">意思決定の停滞日数</Label>
           <Input id="decision_latency_days" name="decision_latency_days" type="number" min={0} />
         </div>
-        <div>
-          <Label htmlFor="adoption_readiness">定着準備度</Label>
-          <Input id="adoption_readiness" name="adoption_readiness" type="number" min={1} max={5} />
-        </div>
+        <ScoreField
+          id="adoption_readiness"
+          label="定着準備度"
+          anchorLow="1 未着手"
+          anchorHigh="5 自走可"
+        />
       </div>
       <div>
         <Label htmlFor="notes">ノート</Label>
@@ -52,5 +54,37 @@ export function AddMeasurementEventForm({
       </div>
       <Button type="submit">測定を保存（追記のみ）</Button>
     </form>
+  );
+}
+
+function ScoreField({
+  id,
+  label,
+  anchorLow,
+  anchorHigh,
+  inverted,
+}: {
+  id: string;
+  label: string;
+  anchorLow: string;
+  anchorHigh: string;
+  inverted?: boolean;
+}) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-1">
+        <Label htmlFor={id}>{label}</Label>
+        {inverted && (
+          <span className="text-[10px] font-mono text-[var(--fg-subtle)]">
+            高=悪い
+          </span>
+        )}
+      </div>
+      <Input id={id} name={id} type="number" min={1} max={5} />
+      <div className="mt-1 flex items-center justify-between text-[10px] font-mono text-[var(--fg-subtle)]">
+        <span>{anchorLow}</span>
+        <span>{anchorHigh}</span>
+      </div>
+    </div>
   );
 }
