@@ -43,9 +43,14 @@ export function AddMeasurementEventForm({
       </div>
       <div>
         <Label htmlFor="notes">ノート</Label>
-        <Textarea id="notes" name="notes" rows={2} />
+        <Textarea
+          id="notes"
+          name="notes"
+          rows={2}
+          placeholder="例：マイルストーン進捗が想定より15%遅延。停滞は意思決定者の不在期間。"
+        />
       </div>
-      <Button type="submit">進捗チェックを append</Button>
+      <Button type="submit">測定を保存（追記のみ）</Button>
     </form>
   );
 }

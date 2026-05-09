@@ -18,11 +18,21 @@ export function AddMemoryDecisionForm({
     <form action={action} className="space-y-3 text-sm">
       <div>
         <Label htmlFor="title">タイトル</Label>
-        <Input id="title" name="title" required />
+        <Input
+          id="title"
+          name="title"
+          required
+          placeholder="例：販社展開と直販の優先度判断"
+        />
       </div>
       <div>
         <Label htmlFor="context">状況・背景</Label>
-        <Textarea id="context" name="context" rows={2} />
+        <Textarea
+          id="context"
+          name="context"
+          rows={2}
+          placeholder="例：販社展開と直販の優先度で意見が割れた局面。期日は四半期末。"
+        />
       </div>
       <div>
         <Label htmlFor="alternatives_considered">
@@ -37,17 +47,33 @@ export function AddMemoryDecisionForm({
       </div>
       <div>
         <Label htmlFor="decision">判断（採用したもの）</Label>
-        <Textarea id="decision" name="decision" rows={2} required />
+        <Textarea
+          id="decision"
+          name="decision"
+          rows={2}
+          required
+          placeholder="例：販社優先で進める。直販は四半期後に再検討。"
+        />
       </div>
       <div>
         <Label htmlFor="rationale">理由</Label>
-        <Textarea id="rationale" name="rationale" rows={2} />
+        <Textarea
+          id="rationale"
+          name="rationale"
+          rows={2}
+          placeholder="例：販社のリーチ速度が高く、検証コストが小さい。"
+        />
       </div>
       <div>
         <Label htmlFor="outcome">結果（任意・後追記でも可）</Label>
-        <Textarea id="outcome" name="outcome" rows={2} />
+        <Textarea
+          id="outcome"
+          name="outcome"
+          rows={2}
+          placeholder="例：3ヶ月後、販社経由の問い合わせが約2倍。"
+        />
       </div>
-      <Button type="submit">decision を append</Button>
+      <Button type="submit">判断記録を保存（追記のみ）</Button>
     </form>
   );
 }

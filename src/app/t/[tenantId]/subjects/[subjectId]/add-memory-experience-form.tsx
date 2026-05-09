@@ -18,7 +18,13 @@ export function AddMemoryExperienceForm({
     <form action={action} className="space-y-3 text-sm">
       <div>
         <Label htmlFor="insight">気づき・洞察</Label>
-        <Textarea id="insight" name="insight" rows={2} required />
+        <Textarea
+          id="insight"
+          name="insight"
+          rows={2}
+          required
+          placeholder="例：この担当は急な変更より、事前に見通しを伝えると動きやすい。"
+        />
       </div>
       <div className="grid md:grid-cols-2 gap-3">
         <div>
@@ -38,7 +44,7 @@ export function AddMemoryExperienceForm({
           <Input id="tags" name="tags" placeholder="動機付け, 言語化" />
         </div>
       </div>
-      <Button type="submit">experience を append</Button>
+      <Button type="submit">気づきを保存（追記のみ）</Button>
     </form>
   );
 }

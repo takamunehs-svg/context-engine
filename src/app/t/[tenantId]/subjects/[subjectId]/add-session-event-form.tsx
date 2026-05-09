@@ -74,13 +74,23 @@ export function AddSessionEventForm({
       </div>
       <div>
         <Label htmlFor="session_notes">支援メモ</Label>
-        <Textarea id="session_notes" name="session_notes" rows={2} />
+        <Textarea
+          id="session_notes"
+          name="session_notes"
+          rows={2}
+          placeholder="例：販社チームと新パッケージの運用フローをレビュー。値引き条件で意見が割れた。"
+        />
       </div>
       <div>
         <Label htmlFor="client_signal">クライアントの反応・社内シグナル</Label>
-        <Textarea id="client_signal" name="client_signal" rows={2} />
+        <Textarea
+          id="client_signal"
+          name="client_signal"
+          rows={2}
+          placeholder="例：営業統括が「現場で回せるか不安」と発言。"
+        />
       </div>
-      <Button type="submit">Activity イベントを append</Button>
+      <Button type="submit">セッション記録を保存（追記のみ）</Button>
     </form>
   );
 }
